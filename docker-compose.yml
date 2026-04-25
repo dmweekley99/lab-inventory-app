@@ -1,0 +1,18 @@
+services:
+    postgres:
+        image: postgres:16
+        container_name: lab_inventory_db
+        restart: always
+        environment:
+            POSTGRES_USER: labuser
+            POSTGRES_PASSWORD: labpass
+            POSTGRES_DB: lab_inventory
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+    postgres_data:
+
