@@ -145,3 +145,23 @@ app.patch("/api/requests/:id/status", async (req, res) => {
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
+
+app.delete("/api/requests/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      "DELETE FROM material_requests WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Request not found" });
+    }
+
+    res.json({ message: "Request deleted", deleted: result.rows[0] });
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({ error: "Failed to delete request" });
+  }
+});
