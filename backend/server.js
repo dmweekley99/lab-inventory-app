@@ -165,3 +165,24 @@ app.delete("/api/requests/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to delete request" });
   }
 });
+
+app.patch("/api/requests/:id/severity", async (req, res) => {
+  const { id } = req.params;
+  const { severity } = req.body;
+
+  try {
+    const result = await pool.query(
+      "UPDATE material_requests SET severity = $1 WHERE id = $2 RETURNING *",
+      [severity, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Request not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Update severity error:", err);
+    res.status(500).json({ error: "Failed to update severity" });
+  }
+});

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
   const [materials, setMaterials] = useState([]);
@@ -41,6 +42,24 @@ function App() {
 
     fetchMaterials();
   };
+
+  const handleSeverityChange = async (id, severity) => {
+    const res = await fetch(`http://localhost:5050/api/requests/${id}/severity`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ severity }),
+    });
+
+    if (!res.ok) {
+      console.error("Failed to update severity");
+      return;
+    }
+
+    fetchMaterials();
+  };
+
   const handleDelete = async (id) => {
     await fetch(`http://localhost:5050/api/requests/${id}`, {
       method: "DELETE"
@@ -50,62 +69,85 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="app-container">
       <h1>Inventory Requests</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Material name"
-          value={form.custom_material_name}
-          onChange={(e) =>
-            setForm({ ...form, custom_material_name: e.target.value })
-          }
-        />
-
-        <input
-          placeholder="Location"
-          value={form.location}
-          onChange={(e) => setForm({ ...form, location: e.target.value })}
-        />
-
-        <select
-          value={form.severity}
-          onChange={(e) => setForm({ ...form, severity: e.target.value })}
-        >
-          <option>Good</option>
-          <option>Low</option>
-          <option>Very Low</option>
-          <option>Critical</option>
-        </select>
-
-        <input
-          placeholder="Notes"
-          value={form.notes}
-          onChange={(e) => setForm({ ...form, notes: e.target.value })}
-        />
-
-        <input
-          placeholder="Your name"
-          value={form.submitted_by}
-          onChange={(e) =>
-            setForm({ ...form, submitted_by: e.target.value })
-          }
-        />
-
-        <button type="submit">Submit</button>
+      <form onSubmit={handleSubmit} className="form-stacked">
+        <div className="form-row">
+          <input
+            placeholder="Material name"
+            value={form.custom_material_name}
+            onChange={(e) =>
+              setForm({ ...form, custom_material_name: e.target.value })
+            }
+          />
+          <input
+            placeholder="Location"
+            value={form.location}
+            onChange={(e) => setForm({ ...form, location: e.target.value })}
+          />
+          <select
+            value={form.severity}
+            onChange={(e) => setForm({ ...form, severity: e.target.value })}
+          >
+            <option value="Good">Good</option>
+            <option value="Low">Low</option>
+            <option value="Very Low">Very Low</option>
+            <option value="Critical">Critical</option>
+          </select>
+          <input
+            placeholder="Your name"
+            value={form.submitted_by}
+            onChange={(e) =>
+              setForm({ ...form, submitted_by: e.target.value })
+            }
+          />
+        </div>
+        <div className="form-row">
+          <input
+            className="notes-input"
+            placeholder="Notes"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          />
+          <button type="submit">Submit</button>
+        </div>
       </form>
 
       <h2>Needs Ordered</h2>
 
       <ul>
-        {materials.map((m) => (
-          <li key={m.id}>
-            {m.material_name} — {m.location} — {m.severity} — {m.status}
-            <button onClick={() => handleDelete(m.id)}>Delete</button>
-          </li>
+        {materials.map((material) => (
+          <div className="card" key={material.id}>
+            <div className="card-content card-content-custom">
+              <div className="card-side-info">
+                <p className="location-label">{material.location}</p>
+                <span className={`badge ${material.severity.toLowerCase()}`}>{material.severity}</span>
+              </div>
+              <div className="card-text-centered">
+                <h3>{material.custom_material_name || material.name}</h3>
+              </div>
+              <div className="card-actions">
+                <select
+                  value={material.severity}
+                  onChange={(e) =>
+                    handleSeverityChange(material.id, e.target.value)
+                  }
+                >
+                  <option value="Good">Good</option>
+                  <option value="Low">Low</option>
+                  <option value="Very Low">Very Low</option>
+                  <option value="Critical">Critical</option>
+                </select>
+                <button onClick={() => handleDelete(material.id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         ))}
       </ul>
-    </div>
+    </div >
   );
 }
 
