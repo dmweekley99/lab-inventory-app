@@ -41,6 +41,13 @@ function App() {
 
     fetchMaterials();
   };
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:5050/api/requests/${id}`, {
+      method: "DELETE"
+    });
+
+    fetchMaterials();
+  };
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -94,6 +101,7 @@ function App() {
         {materials.map((m) => (
           <li key={m.id}>
             {m.material_name} — {m.location} — {m.severity} — {m.status}
+            <button onClick={() => handleDelete(m.id)}>Delete</button>
           </li>
         ))}
       </ul>
