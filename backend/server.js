@@ -94,7 +94,7 @@ app.get("/api/requests", async (req, res) => {
 app.post("/api/requests", async (req, res) => {
   try {
     const {
-      material_id,
+      material_id, // allow direct linking if provided
       custom_material_name,
       location,
       severity,
@@ -102,14 +102,29 @@ app.post("/api/requests", async (req, res) => {
       submitted_by,
     } = req.body;
 
+    let finalMaterialId = material_id || null;
+    let finalCustomMaterialName = custom_material_name || null;
+
+    // If no material_id but a custom_material_name is provided, check catalog
+    if (!finalMaterialId && custom_material_name) {
+      const catalogRes = await pool.query(
+        "SELECT id FROM material_catalog WHERE LOWER(name) = LOWER($1) LIMIT 1",
+        [custom_material_name]
+      );
+      if (catalogRes.rows.length > 0) {
+        finalMaterialId = catalogRes.rows[0].id;
+        finalCustomMaterialName = null; // Use catalog, not custom
+      }
+    }
+
     const result = await pool.query(
       `INSERT INTO material_requests
       (material_id, custom_material_name, location, severity, notes, submitted_by)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`,
       [
-        material_id || null,
-        custom_material_name || null,
+        finalMaterialId,
+        finalCustomMaterialName,
         location,
         severity,
         notes,
