@@ -45,33 +45,23 @@ app.post("/api/catalog", async (req, res) => {
   try {
     const {
       name,
-      category,
+      catalog_number,
+      severity,
       default_location,
+      category,
       preferred_vendor,
       purchase_url,
-      severity,
-      location,
     } = req.body;
 
-    // Insert severity/location as custom columns if not present, or store in notes
-    // For now, store severity/location in notes JSON if not present in schema
     let result;
     try {
       result = await pool.query(
         `INSERT INTO material_catalog
-        (name, category, default_location, preferred_vendor, purchase_url)
-        VALUES ($1, $2, $3, $4, $5)
+        (name, catalog_number, severity, default_location, category, preferred_vendor, purchase_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *`,
-        [name, category, location || default_location, preferred_vendor, purchase_url]
+        [name, catalog_number, severity, default_location, category, preferred_vendor, purchase_url]
       );
-      // Optionally, update the row with severity as a pseudo-column (if schema allows)
-      if (severity) {
-        await pool.query(
-          `UPDATE material_catalog SET notes = $1 WHERE id = $2`,
-          [JSON.stringify({ severity }), result.rows[0].id]
-        );
-        result.rows[0].notes = JSON.stringify({ severity });
-      }
     } catch (err) {
       if (err.code === '23505') {
         // Duplicate key error (unique constraint violation)

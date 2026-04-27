@@ -5,10 +5,12 @@ function InventoryCatalog() {
     const [items, setItems] = useState([]);
     const [form, setForm] = useState({
         name: "",
+        catalog_number: "",
         severity: "",
-        location: "",
-        notes: "",
+        default_location: "",
         category: "General",
+        preferred_vendor: "",
+        purchase_url: "",
     });
 
     const [filter, setFilter] = useState("");
@@ -104,12 +106,12 @@ function InventoryCatalog() {
             },
             body: JSON.stringify({
                 name: form.name,
-                category: form.category,
-                default_location: form.location,
-                preferred_vendor: "",
-                purchase_url: "",
+                catalog_number: form.catalog_number,
                 severity: form.severity,
-                location: form.location,
+                default_location: form.default_location,
+                category: form.category,
+                preferred_vendor: form.preferred_vendor,
+                purchase_url: form.purchase_url,
             }),
         });
 
@@ -119,15 +121,15 @@ function InventoryCatalog() {
         }
 
         const newItem = await res.json();
-
         setItems([...items, newItem]);
-
         setForm({
             name: "",
+            catalog_number: "",
             severity: "",
-            location: "",
-            notes: "",
+            default_location: "",
             category: "General",
+            preferred_vendor: "",
+            purchase_url: "",
         });
     };
 
@@ -153,7 +155,7 @@ function InventoryCatalog() {
 
     return (
         <div className="inventory-catalog">
-            <h2>Inventory Catalog</h2>
+            <h1>Inventory Catalog</h1>
 
             <form onSubmit={handleSubmit} className="inventory-form">
                 <input
@@ -165,21 +167,15 @@ function InventoryCatalog() {
                     placeholder="Item Name"
                     required
                 />
-
-                <select
-                    id="catalog-category"
-                    name="category"
+                <input
+                    id="catalog-number"
+                    name="catalog_number"
                     autoComplete="off"
-                    value={form.category}
+                    value={form.catalog_number}
                     onChange={handleChange}
-                >
-                    {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
-
+                    placeholder="Catalog Number"
+                    required
+                />
                 <select
                     id="catalog-severity"
                     name="severity"
@@ -194,25 +190,39 @@ function InventoryCatalog() {
                     <option value="Very Low">Very Low</option>
                     <option value="Critical">Critical</option>
                 </select>
-
                 <input
-                    id="catalog-location"
-                    name="location"
+                    id="catalog-default-location"
+                    name="default_location"
                     autoComplete="off"
-                    value={form.location}
+                    value={form.default_location}
                     onChange={handleChange}
-                    placeholder="Location"
+                    placeholder="Default Location"
+                    required
                 />
-
                 <input
-                    id="catalog-notes"
-                    name="notes"
+                    id="catalog-category"
+                    name="category"
                     autoComplete="off"
-                    value={form.notes}
+                    value={form.category}
                     onChange={handleChange}
-                    placeholder="Notes"
+                    placeholder="Category"
                 />
-
+                <input
+                    id="catalog-preferred-vendor"
+                    name="preferred_vendor"
+                    autoComplete="off"
+                    value={form.preferred_vendor}
+                    onChange={handleChange}
+                    placeholder="Preferred Vendor"
+                />
+                <input
+                    id="catalog-purchase-url"
+                    name="purchase_url"
+                    autoComplete="off"
+                    value={form.purchase_url}
+                    onChange={handleChange}
+                    placeholder="Purchase URL"
+                />
                 <button type="submit">Add Item</button>
             </form>
 

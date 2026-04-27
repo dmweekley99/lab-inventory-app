@@ -1,9 +1,9 @@
 CREATE TABLE material_catalog (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
-  catalog_number TEXT,
-  severity TEXT CHECK (severity IN ('Good', 'Low', 'Very Low', 'Critical')),
-  default_location TEXT,
+  catalog_number TEXT NOT NULL,
+  severity TEXT NOT NULL CHECK (severity IN ('Good', 'Low', 'Very Low', 'Critical')),
+  default_location TEXT NOT NULL,
   preferred_vendor TEXT,
   purchase_url TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
