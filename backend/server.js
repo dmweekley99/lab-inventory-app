@@ -12,6 +12,21 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// Delete material from catalog by id
+app.delete("/api/catalog/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query("DELETE FROM material_catalog WHERE id = $1 RETURNING *", [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Item not found." });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error("DELETE /api/catalog/:id error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get all catalog materials
 app.get("/api/catalog", async (req, res) => {
   try {
@@ -34,16 +49,36 @@ app.post("/api/catalog", async (req, res) => {
       default_location,
       preferred_vendor,
       purchase_url,
+      severity,
+      location,
     } = req.body;
 
-    const result = await pool.query(
-      `INSERT INTO material_catalog
-      (name, category, default_location, preferred_vendor, purchase_url)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *`,
-      [name, category, default_location, preferred_vendor, purchase_url]
-    );
-
+    // Insert severity/location as custom columns if not present, or store in notes
+    // For now, store severity/location in notes JSON if not present in schema
+    let result;
+    try {
+      result = await pool.query(
+        `INSERT INTO material_catalog
+        (name, category, default_location, preferred_vendor, purchase_url)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *`,
+        [name, category, location || default_location, preferred_vendor, purchase_url]
+      );
+      // Optionally, update the row with severity as a pseudo-column (if schema allows)
+      if (severity) {
+        await pool.query(
+          `UPDATE material_catalog SET notes = $1 WHERE id = $2`,
+          [JSON.stringify({ severity }), result.rows[0].id]
+        );
+        result.rows[0].notes = JSON.stringify({ severity });
+      }
+    } catch (err) {
+      if (err.code === '23505') {
+        // Duplicate key error (unique constraint violation)
+        return res.status(409).json({ error: 'Item already exists in the catalog.' });
+      }
+      return res.status(500).json({ error: err.message });
+    }
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error("POST /api/catalog error:", err);
@@ -157,10 +192,6 @@ app.patch("/api/requests/:id/status", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
-
 app.delete("/api/requests/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -200,4 +231,8 @@ app.patch("/api/requests/:id/severity", async (req, res) => {
     console.error("Update severity error:", err);
     res.status(500).json({ error: "Failed to update severity" });
   }
+});
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });

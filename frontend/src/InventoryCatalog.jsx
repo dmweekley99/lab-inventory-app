@@ -5,19 +5,41 @@ function InventoryCatalog() {
     const [items, setItems] = useState([]);
     const [form, setForm] = useState({
         name: "",
-        severity: "Low",
+        severity: "",
         location: "",
         notes: "",
-        category: "General"
+        category: "General",
     });
+
     const [filter, setFilter] = useState("");
     const [filterCategory, setFilterCategory] = useState("");
 
+    const fetchCatalog = async () => {
+        const res = await fetch("http://localhost:5050/api/catalog");
+        const data = await res.json();
+
+        setItems(
+            data.map((item) => {
+                let severity = item.severity;
+
+                if (!severity && item.notes) {
+                    try {
+                        const notesObj = JSON.parse(item.notes);
+                        if (notesObj && notesObj.severity) {
+                            severity = notesObj.severity;
+                        }
+                    } catch {
+                        // ignore invalid JSON notes
+                    }
+                }
+
+                return { ...item, severity };
+            })
+        );
+    };
+
     useEffect(() => {
-        // Fetch catalog items from backend
-        fetch("http://localhost:5050/api/catalog")
-            .then((res) => res.json())
-            .then((data) => setItems(data));
+        fetchCatalog();
     }, []);
 
     const handleChange = (e) => {
@@ -25,138 +47,252 @@ function InventoryCatalog() {
     };
 
     const handleRequest = async (item) => {
-        // POST to backend Inventory Requests API
-        await fetch("http://localhost:5050/api/requests", {
+        const res = await fetch("http://localhost:5050/api/requests", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({
                 custom_material_name: item.name,
-                location: item.location,
-                severity: item.severity,
-                notes: item.notes,
-                submitted_by: "Catalog Quick Add"
-            })
+                location: item.location || item.default_location || "",
+                severity: item.severity || "",
+                notes: item.notes || "",
+                submitted_by: "Catalog Quick Add",
+            }),
         });
-        alert(`Requested: ${item.name}`);
+
+        if (!res.ok) {
+            console.error("Failed to create request");
+            return;
+        }
+
+        window.location.href = "/";
+    };
+
+    const handleDelete = async (item) => {
+        const confirm1 = window.confirm(
+            `Are you sure you want to delete '${item.name}' from the catalog? This cannot be undone.`
+        );
+
+        if (!confirm1) return;
+
+        const confirm2 = window.confirm(
+            `Please confirm again: Delete '${item.name}'?`
+        );
+
+        if (!confirm2) return;
+
+        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+            method: "DELETE",
+        });
+
+        if (!res.ok) {
+            console.error("Failed to delete catalog item");
+            return;
+        }
+
+        setItems(items.filter((i) => i.id !== item.id));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add new item to catalog via backend
+
         const res = await fetch("http://localhost:5050/api/catalog", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({
                 name: form.name,
                 category: form.category,
                 default_location: form.location,
                 preferred_vendor: "",
-                purchase_url: ""
-            })
+                purchase_url: "",
+                severity: form.severity,
+                location: form.location,
+            }),
         });
+
+        if (!res.ok) {
+            console.error("Failed to add catalog item");
+            return;
+        }
+
         const newItem = await res.json();
+
         setItems([...items, newItem]);
-        setForm({ name: "", severity: "Low", location: "", notes: "", category: "General" });
+
+        setForm({
+            name: "",
+            severity: "",
+            location: "",
+            notes: "",
+            category: "General",
+        });
     };
 
-    const lowItems = items.filter((item) => item.severity === "Low" || item.severity === "Very Low" || item.severity === "Critical");
+    const lowItems = items.filter(
+        (item) =>
+            item.severity === "Low" ||
+            item.severity === "Very Low" ||
+            item.severity === "Critical"
+    );
 
-    // Unique categories for filter dropdown
     const categories = [
-        ...new Set(["General", ...items.map((item) => item.category || "General")])
+        ...new Set(["General", ...items.map((item) => item.category || "General")]),
     ];
 
-    // Filtered items
-    const filteredItems = items.filter(
-        (item) =>
-            (!filter || item.name.toLowerCase().includes(filter.toLowerCase())) &&
+    const filteredItems = items.filter((item) => {
+        const itemName = item.name || "";
+
+        return (
+            (!filter || itemName.toLowerCase().includes(filter.toLowerCase())) &&
             (!filterCategory || (item.category || "General") === filterCategory)
-    );
+        );
+    });
 
     return (
         <div className="inventory-catalog">
             <h2>Inventory Catalog</h2>
+
             <form onSubmit={handleSubmit} className="inventory-form">
                 <input
+                    id="catalog-name"
                     name="name"
+                    autoComplete="off"
                     value={form.name}
                     onChange={handleChange}
                     placeholder="Item Name"
                     required
                 />
+
                 <select
+                    id="catalog-category"
                     name="category"
+                    autoComplete="off"
                     value={form.category}
                     onChange={handleChange}
                 >
                     {categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
+                        <option key={cat} value={cat}>
+                            {cat}
+                        </option>
                     ))}
                 </select>
+
                 <select
+                    id="catalog-severity"
                     name="severity"
+                    autoComplete="off"
                     value={form.severity}
                     onChange={handleChange}
                     required
                 >
+                    <option value="">Select Severity</option>
                     <option value="Good">Good</option>
                     <option value="Low">Low</option>
                     <option value="Very Low">Very Low</option>
                     <option value="Critical">Critical</option>
                 </select>
+
                 <input
+                    id="catalog-location"
                     name="location"
+                    autoComplete="off"
                     value={form.location}
                     onChange={handleChange}
                     placeholder="Location"
                 />
+
                 <input
+                    id="catalog-notes"
                     name="notes"
+                    autoComplete="off"
                     value={form.notes}
                     onChange={handleChange}
                     placeholder="Notes"
                 />
+
                 <button type="submit">Add Item</button>
             </form>
 
-            <div style={{ margin: '1em 0' }}>
+            <div style={{ margin: "1em 0" }}>
                 <input
                     type="text"
                     placeholder="Filter by name..."
                     value={filter}
-                    onChange={e => setFilter(e.target.value)}
+                    onChange={(e) => setFilter(e.target.value)}
                     style={{ marginRight: 8 }}
                 />
+
                 <select
                     value={filterCategory}
-                    onChange={e => setFilterCategory(e.target.value)}
+                    onChange={(e) => setFilterCategory(e.target.value)}
                 >
                     <option value="">All Categories</option>
                     {categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
+                        <option key={cat} value={cat}>
+                            {cat}
+                        </option>
                     ))}
                 </select>
             </div>
 
             <h3>All Items</h3>
-            <ul>
+
+            <div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
-                    <li key={item.id}>
-                        <strong>{item.name}</strong> {item.severity} - {item.location} {item.notes && `- ${item.notes}`} [{item.category || "General"}]
-                        <button style={{ marginLeft: 8 }} onClick={() => handleRequest(item)}>Request This</button>
-                    </li>
+                    <div className="inventory-card" key={item.id}>
+                        <div className="card-title">{item.name}</div>
+                        <div className="card-category">{item.category || "General"}</div>
+                        <div className="card-severity">
+                            Severity: {item.severity || "N/A"}
+                        </div>
+                        <div className="card-location">
+                            Location: {item.location || item.default_location || "N/A"}
+                        </div>
+
+                        {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
+
+                        <div className="card-actions">
+                            <button onClick={() => handleRequest(item)}>Request This</button>
+                            <button
+                                style={{ background: "#e74c3c", color: "#fff" }}
+                                onClick={() => handleDelete(item)}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
                 ))}
-            </ul>
+            </div>
+
             <h3>Low Inventory Items</h3>
-            <ul>
-                {lowItems.length === 0 && <li>No low inventory items.</li>}
+
+            <div className="inventory-catalog-cards">
+                {lowItems.length === 0 && (
+                    <div style={{ color: "#b0b3b8" }}>No low inventory items.</div>
+                )}
+
                 {lowItems.map((item) => (
-                    <li key={item.id}>
-                        <strong>{item.name}</strong> ({item.severity}) - {item.location} [{item.category || "General"}]
-                        <button style={{ marginLeft: 8 }} onClick={() => handleRequest(item)}>Request This</button>
-                    </li>
+                    <div className="inventory-card" key={item.id}>
+                        <div className="card-title">{item.name}</div>
+                        <div className="card-category">{item.category || "General"}</div>
+                        <div className="card-severity">
+                            Severity: {item.severity || "N/A"}
+                        </div>
+                        <div className="card-location">
+                            Location: {item.location || item.default_location || "N/A"}
+                        </div>
+
+                        {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
+
+                        <div className="card-actions">
+                            <button onClick={() => handleRequest(item)}>Request This</button>
+                        </div>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }

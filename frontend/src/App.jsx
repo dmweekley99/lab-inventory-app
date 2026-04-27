@@ -9,7 +9,7 @@ function App() {
   const [form, setForm] = useState({
     custom_material_name: "",
     location: "",
-    severity: "Low",
+    severity: "",
     notes: "",
     submitted_by: ""
   });
@@ -38,7 +38,7 @@ function App() {
     setForm({
       custom_material_name: "",
       location: "",
-      severity: "Low",
+      severity: "",
       notes: "",
       submitted_by: ""
     });
@@ -86,6 +86,9 @@ function App() {
               <form onSubmit={handleSubmit} className="form-stacked">
                 <div className="form-row">
                   <input
+                    id="request-material-name"
+                    name="custom_material_name"
+                    autoComplete="off"
                     placeholder="Material name"
                     value={form.custom_material_name}
                     onChange={(e) =>
@@ -93,20 +96,30 @@ function App() {
                     }
                   />
                   <input
+                    id="request-location"
+                    name="location"
+                    autoComplete="off"
                     placeholder="Location"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
                   />
                   <select
+                    id="request-severity"
+                    name="severity"
+                    autoComplete="off"
                     value={form.severity}
                     onChange={(e) => setForm({ ...form, severity: e.target.value })}
                   >
+                    <option value="">Select Severity</option>
                     <option value="Good">Good</option>
                     <option value="Low">Low</option>
                     <option value="Very Low">Very Low</option>
                     <option value="Critical">Critical</option>
                   </select>
                   <input
+                    id="request-submitted-by"
+                    name="submitted_by"
+                    autoComplete="off"
                     placeholder="Your name"
                     value={form.submitted_by}
                     onChange={(e) =>
@@ -116,7 +129,10 @@ function App() {
                 </div>
                 <div className="form-row">
                   <input
+                    id="request-notes"
+                    name="notes"
                     className="notes-input"
+                    autoComplete="off"
                     placeholder="Notes"
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
