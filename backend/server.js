@@ -12,6 +12,60 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// Get a single request by id
+app.get("/api/requests/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `SELECT
+        r.id,
+        r.material_id,
+        c.name AS catalog_material_name,
+        r.custom_material_name,
+        COALESCE(c.name, r.custom_material_name) AS material_name,
+        r.location,
+        r.severity,
+        r.notes,
+        r.status,
+        r.submitted_by,
+        r.created_at,
+        c.category,
+        c.preferred_vendor,
+        c.purchase_url
+      FROM material_requests r
+      LEFT JOIN material_catalog c ON r.material_id = c.id
+      WHERE r.id = $1
+      LIMIT 1`,
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Request not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("GET /api/requests/:id error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get a single catalog item by id
+app.get("/api/catalog/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      "SELECT * FROM material_catalog WHERE id = $1 LIMIT 1",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Catalog item not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("GET /api/catalog/:id error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Delete material from catalog by id
 app.delete("/api/catalog/:id", async (req, res) => {
   try {

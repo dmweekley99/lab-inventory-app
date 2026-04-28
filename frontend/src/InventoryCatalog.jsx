@@ -253,17 +253,17 @@ function InventoryCatalog() {
             <div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
                     <div className="inventory-card" key={item.id}>
-                        <div className="card-title">{item.name}</div>
-                        <div className="card-category">{item.category || "General"}</div>
-                        <div className="card-severity">
-                            Severity: {item.severity || "N/A"}
-                        </div>
-                        <div className="card-location">
-                            Location: {item.location || item.default_location || "N/A"}
-                        </div>
-
-                        {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
-
+                        <a href={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                            <div className="card-title">{item.name}</div>
+                            <div className="card-category">{item.category || "General"}</div>
+                            <div className="card-severity">
+                                Severity: {item.severity || "N/A"}
+                            </div>
+                            <div className="card-location">
+                                Location: {item.location || item.default_location || "N/A"}
+                            </div>
+                            {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
+                        </a>
                         <div className="card-actions">
                             <button onClick={() => handleRequest(item)}>Request This</button>
                             <button
@@ -286,17 +286,17 @@ function InventoryCatalog() {
 
                 {lowItems.map((item) => (
                     <div className="inventory-card" key={item.id}>
-                        <div className="card-title">{item.name}</div>
-                        <div className="card-category">{item.category || "General"}</div>
-                        <div className="card-severity">
-                            Severity: {item.severity || "N/A"}
-                        </div>
-                        <div className="card-location">
-                            Location: {item.location || item.default_location || "N/A"}
-                        </div>
-
-                        {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
-
+                        <a href={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                            <div className="card-title">{item.name}</div>
+                            <div className="card-category">{item.category || "General"}</div>
+                            <div className="card-severity">
+                                Severity: {item.severity || "N/A"}
+                            </div>
+                            <div className="card-location">
+                                Location: {item.location || item.default_location || "N/A"}
+                            </div>
+                            {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
+                        </a>
                         <div className="card-actions">
                             <button onClick={() => handleRequest(item)}>Request This</button>
                         </div>
