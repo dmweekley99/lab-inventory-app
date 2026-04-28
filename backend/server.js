@@ -180,8 +180,8 @@ app.post("/api/requests", async (req, res) => {
       submitted_by,
     } = req.body;
 
-    let finalMaterialId = material_id || null;
-    let finalCustomMaterialName = custom_material_name || null;
+    let finalMaterialId = material_id;
+    let finalCustomMaterialName = custom_material_name;
 
     // If no material_id but a custom_material_name is provided, check catalog
     if (!finalMaterialId && custom_material_name) {
@@ -191,7 +191,7 @@ app.post("/api/requests", async (req, res) => {
       );
       if (catalogRes.rows.length > 0) {
         finalMaterialId = catalogRes.rows[0].id;
-        finalCustomMaterialName = null; // Use catalog, not custom
+        // Do NOT set finalCustomMaterialName to null; always keep the provided name
       }
     }
 

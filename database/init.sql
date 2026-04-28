@@ -1,6 +1,6 @@
 CREATE TABLE material_catalog (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
   catalog_number TEXT NOT NULL,
   severity TEXT NOT NULL CHECK (severity IN ('Good', 'Low', 'Very Low', 'Critical')),
   default_location TEXT NOT NULL,
