@@ -52,9 +52,6 @@ function ItemDetail({ type }) {
                 {item.catalog_number && (
                     <p><strong>Catalog Number:</strong> {item.catalog_number}</p>
                 )}
-                {item.category && (
-                    <p><strong>Category:</strong> {item.category}</p>
-                )}
                 {item.preferred_vendor && (
                     <p><strong>Preferred Vendor:</strong> {item.preferred_vendor}</p>
                 )}

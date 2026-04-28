@@ -10,13 +10,11 @@ function InventoryCatalog() {
         catalog_number: "",
         severity: "",
         default_location: "",
-        category: "General",
         preferred_vendor: "",
         purchase_url: "",
         notes: "",
     });
     const [filter, setFilter] = useState("");
-    const [filterCategory, setFilterCategory] = useState("");
 
 
     const fetchCatalog = async () => {
@@ -83,7 +81,7 @@ function InventoryCatalog() {
             return;
         }
 
-        window.location.href = "/";
+        window.location.href = "/requests";
     };
 
     const handleDelete = async (item) => {
@@ -92,12 +90,6 @@ function InventoryCatalog() {
         );
 
         if (!confirm1) return;
-
-        const confirm2 = window.confirm(
-            `Please confirm again: Delete '${item.name}'?`
-        );
-
-        if (!confirm2) return;
 
         const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
             method: "DELETE",
@@ -124,7 +116,6 @@ function InventoryCatalog() {
                 catalog_number: form.catalog_number,
                 severity: form.severity,
                 default_location: form.default_location,
-                category: form.category,
                 preferred_vendor: form.preferred_vendor,
                 purchase_url: form.purchase_url,
             }),
@@ -142,7 +133,6 @@ function InventoryCatalog() {
             catalog_number: "",
             severity: "",
             default_location: "",
-            category: "General",
             preferred_vendor: "",
             purchase_url: "",
         });
@@ -155,16 +145,11 @@ function InventoryCatalog() {
             item.severity === "Critical"
     );
 
-    const categories = [
-        ...new Set(["General", ...items.map((item) => item.category || "General")]),
-    ];
-
     const filteredItems = items.filter((item) => {
         const itemName = item.name || "";
 
         return (
-            (!filter || itemName.toLowerCase().includes(filter.toLowerCase())) &&
-            (!filterCategory || (item.category || "General") === filterCategory)
+            (!filter || itemName.toLowerCase().includes(filter.toLowerCase()))
         );
     });
 
@@ -215,14 +200,6 @@ function InventoryCatalog() {
                     required
                 />
                 <input
-                    id="catalog-category"
-                    name="category"
-                    autoComplete="off"
-                    value={form.category}
-                    onChange={handleChange}
-                    placeholder="Category"
-                />
-                <input
                     id="catalog-preferred-vendor"
                     name="preferred_vendor"
                     autoComplete="off"
@@ -249,18 +226,6 @@ function InventoryCatalog() {
                     onChange={(e) => setFilter(e.target.value)}
                     style={{ marginRight: 8 }}
                 />
-
-                <select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                >
-                    <option value="">All Categories</option>
-                    {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
             </div>
 
             <h3>All Items</h3>
@@ -270,7 +235,6 @@ function InventoryCatalog() {
                     <div className="inventory-card" key={item.id}>
                         <a href={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                             <div className="card-title">{item.name}</div>
-                            <div className="card-category">{item.category || "General"}</div>
                             <div className="card-severity">
                                 Severity: {item.severity || "N/A"}
                             </div>
@@ -281,12 +245,6 @@ function InventoryCatalog() {
                         </a>
                         <div className="card-actions">
                             <button onClick={() => handleRequest(item)}>Request This</button>
-                            <button
-                                style={{ background: "#e74c3c", color: "#fff" }}
-                                onClick={() => handleDelete(item)}
-                            >
-                                Delete
-                            </button>
                         </div>
                     </div>
                 ))}
@@ -303,7 +261,6 @@ function InventoryCatalog() {
                     <div className="inventory-card" key={item.id}>
                         <a href={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                             <div className="card-title">{item.name}</div>
-                            <div className="card-category">{item.category || "General"}</div>
                             <div className="card-severity">
                                 Severity: {item.severity || "N/A"}
                             </div>

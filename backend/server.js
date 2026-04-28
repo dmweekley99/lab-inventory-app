@@ -29,7 +29,6 @@ app.get("/api/requests/:id", async (req, res) => {
         r.status,
         r.submitted_by,
         r.created_at,
-        c.category,
         c.preferred_vendor,
         c.purchase_url
       FROM material_requests r
@@ -97,12 +96,12 @@ app.get("/api/catalog", async (req, res) => {
 // Add material to catalog
 app.post("/api/catalog", async (req, res) => {
   try {
+    console.log("POST /api/catalog called with body:", req.body);
     const {
       name,
       catalog_number,
       severity,
       default_location,
-      category,
       preferred_vendor,
       purchase_url,
     } = req.body;
@@ -111,12 +110,13 @@ app.post("/api/catalog", async (req, res) => {
     try {
       result = await pool.query(
         `INSERT INTO material_catalog
-        (name, catalog_number, severity, default_location, category, preferred_vendor, purchase_url)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        (name, catalog_number, severity, default_location, preferred_vendor, purchase_url)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`,
-        [name, catalog_number, severity, default_location, category, preferred_vendor, purchase_url]
+        [name, catalog_number, severity, default_location, preferred_vendor, purchase_url]
       );
     } catch (err) {
+      console.error("Error during INSERT INTO material_catalog:", err);
       if (err.code === '23505') {
         // Duplicate key error (unique constraint violation)
         return res.status(409).json({ error: 'Item already exists in the catalog.' });
@@ -146,7 +146,6 @@ app.get("/api/requests", async (req, res) => {
         r.status,
         r.submitted_by,
         r.created_at,
-        c.category,
         c.preferred_vendor,
         c.purchase_url
       FROM material_requests r
