@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import "./App.css";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function InventoryCatalog() {
+    const location = useLocation();
     const [items, setItems] = useState([]);
     const [form, setForm] = useState({
         name: "",
@@ -11,10 +13,11 @@ function InventoryCatalog() {
         category: "General",
         preferred_vendor: "",
         purchase_url: "",
+        notes: "",
     });
-
     const [filter, setFilter] = useState("");
     const [filterCategory, setFilterCategory] = useState("");
+
 
     const fetchCatalog = async () => {
         const res = await fetch("http://localhost:5050/api/catalog");
@@ -40,13 +43,25 @@ function InventoryCatalog() {
         );
     };
 
+    // Prefill form from query params if present
     useEffect(() => {
         fetchCatalog();
-    }, []);
+        const params = new URLSearchParams(location.search);
+        const prefill = {};
+        for (const key of ["name", "severity", "default_location", "notes"]) {
+            if (params.get(key)) prefill[key] = params.get(key);
+        }
+        if (Object.keys(prefill).length > 0) {
+            setForm((f) => ({ ...f, ...prefill }));
+        }
+    }, [location.search]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
+    // ...existing code...
+
+    // The rest of the component remains unchanged
 
     const handleRequest = async (item) => {
         const res = await fetch("http://localhost:5050/api/requests", {
@@ -306,5 +321,4 @@ function InventoryCatalog() {
         </div>
     );
 }
-
 export default InventoryCatalog;

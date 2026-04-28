@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./App.css";
 
 function InventoryRequests() {
+    const navigate = useNavigate();
     const [materials, setMaterials] = useState([]);
     const [form, setForm] = useState({
         custom_material_name: "",
@@ -141,6 +142,21 @@ function InventoryRequests() {
                             </select>
                             <button onClick={() => handleDelete(material.id)}>
                                 Delete
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Prefill catalog form with request info
+                                    const params = new URLSearchParams({
+                                        name: material.custom_material_name || material.name || "",
+                                        severity: material.severity || "",
+                                        default_location: material.location || "",
+                                        notes: material.notes || "",
+                                    });
+                                    navigate(`/catalog?${params.toString()}`);
+                                }}
+                                style={{ background: '#4caf50', color: '#fff' }}
+                            >
+                                Add to Catalog
                             </button>
                         </div>
                     </div>
