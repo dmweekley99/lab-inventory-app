@@ -33,7 +33,7 @@ function ItemDetail({ type }) {
 
     return (
         <div className="item-detail-container">
-            <Link to="/">&larr; Back to Inventory Requests</Link>
+            <Link to="/">&larr; Back to Home</Link>
             <h1>Item Details</h1>
             <div className="item-detail-card">
                 <h2>{item.custom_material_name || item.name}</h2>
