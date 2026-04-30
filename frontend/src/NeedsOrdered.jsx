@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import OrderedButton from "./OrderedButton";
+import DownloadCSVButton from "./DownloadCSVButton";
 import "./App.css";
 
 function NeedsOrdered() {
@@ -41,7 +42,10 @@ function NeedsOrdered() {
 
     return (
         <div>
-            <h1>Needs Ordered</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginTop: 24, marginBottom: 16 }}>
+                <h1 style={{ margin: 0 }}>Needs Ordered</h1>
+                <DownloadCSVButton items={filteredItems} />
+            </div>
             <div style={{ margin: "1em 0" }}>
                 <input
                     type="text"
