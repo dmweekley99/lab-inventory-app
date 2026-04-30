@@ -14,7 +14,7 @@ function InventoryCatalog() {
         purchase_url: "",
         notes: "",
     });
-    const [filter, setFilter] = useState("");
+    // Remove separate filter states, use form state for filtering
 
 
     const fetchCatalog = async () => {
@@ -124,10 +124,13 @@ function InventoryCatalog() {
     );
 
     const filteredItems = items.filter((item) => {
-        const itemName = item.name || "";
-
+        const itemName = (item.name || "").toLowerCase();
+        const itemLocation = (item.location || item.default_location || "").toLowerCase();
+        const itemVendor = (item.preferred_vendor || "").toLowerCase();
         return (
-            (!filter || itemName.toLowerCase().includes(filter.toLowerCase()))
+            (!form.name || itemName.includes(form.name.toLowerCase())) &&
+            (!form.default_location || itemLocation.includes(form.default_location.toLowerCase())) &&
+            (!form.preferred_vendor || itemVendor.includes(form.preferred_vendor.toLowerCase()))
         );
     });
 
@@ -143,7 +146,8 @@ function InventoryCatalog() {
                     value={form.name}
                     onChange={handleChange}
                     placeholder="Item Name"
-                    required />
+                    required
+                />
                 <input
                     id="catalog-number"
                     name="catalog_number"
@@ -151,7 +155,8 @@ function InventoryCatalog() {
                     value={form.catalog_number}
                     onChange={handleChange}
                     placeholder="Catalog Number"
-                    required />
+                    required
+                />
                 <select
                     id="catalog-severity"
                     name="severity"
@@ -172,31 +177,27 @@ function InventoryCatalog() {
                     autoComplete="off"
                     value={form.default_location}
                     onChange={handleChange}
-                    placeholder="Default Location"
-                    required />
+                    placeholder="Location"
+                    required
+                />
                 <input
                     id="catalog-preferred-vendor"
                     name="preferred_vendor"
                     autoComplete="off"
                     value={form.preferred_vendor}
                     onChange={handleChange}
-                    placeholder="Preferred Vendor" />
+                    placeholder="Preferred Vendor (filters list)"
+                />
                 <input
                     id="catalog-purchase-url"
                     name="purchase_url"
                     autoComplete="off"
                     value={form.purchase_url}
                     onChange={handleChange}
-                    placeholder="Purchase URL" />
+                    placeholder="Purchase URL"
+                />
                 <button type="submit">Add Item</button>
             </form>
-
-            <input
-                type="text"
-                placeholder="Filter by name..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                style={{ marginRight: 8 }} />
         </div><h3>All Items</h3><div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
                     <div className="inventory-card" key={item.id} style={{ position: 'relative' }}>
