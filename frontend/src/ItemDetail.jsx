@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import OrderedButton from "./OrderedButton";
 
 function ItemDetail({ type }) {
     const { id } = useParams();
@@ -71,10 +72,10 @@ function ItemDetail({ type }) {
                             <label><strong>Name: </strong></label>
                             <input name="custom_material_name" value={editForm.custom_material_name || editForm.name || ""} onChange={handleEditChange} />
                         </div>
-                        {(editForm.location !== undefined || editForm.default_location !== undefined) && (
+                        {editForm.default_location !== undefined && (
                             <div style={{ marginBottom: 12 }}>
                                 <label><strong>Location: </strong></label>
-                                <input name="location" value={editForm.location || editForm.default_location || ""} onChange={handleEditChange} />
+                                <input name="default_location" value={editForm.default_location || ""} onChange={handleEditChange} />
                             </div>
                         )}
                         {editForm.severity !== undefined && (
@@ -136,6 +137,12 @@ function ItemDetail({ type }) {
                         )}
                         {item.preferred_vendor && (
                             <p><strong>Preferred Vendor:</strong> {item.preferred_vendor}</p>
+                        )}
+                        {item.ordered_on && (
+                            <p><strong>Ordered On:</strong> {new Date(item.ordered_on).toLocaleString()}</p>
+                        )}
+                        {item.delivered_on && (
+                            <p><strong>Delivered On:</strong> {new Date(item.delivered_on).toLocaleString()}</p>
                         )}
                         {item.purchase_url && (
                             <p><strong>Purchase URL:</strong> {(() => {
