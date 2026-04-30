@@ -12,7 +12,7 @@ function OrderedButton({ item, onOrdered }) {
         const status = `Ordered by ${user} on ${dateStr}`;
         const ordered_on = now.toISOString();
         const ordered_by = user;
-        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status, ordered_on, ordered_by })

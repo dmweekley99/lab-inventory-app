@@ -18,7 +18,7 @@ function InventoryCatalog() {
 
 
     const fetchCatalog = async () => {
-        const res = await fetch("http://localhost:5050/api/catalog");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`);
         const data = await res.json();
 
         setItems(
@@ -69,7 +69,7 @@ function InventoryCatalog() {
 
         if (!confirm1) return;
 
-        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
             method: "DELETE",
         });
 
@@ -84,7 +84,7 @@ function InventoryCatalog() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const res = await fetch("http://localhost:5050/api/catalog", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -256,7 +256,7 @@ function InventoryCatalog() {
                                     if (["Low", "Very Low", "Critical"].includes(newSeverity)) {
                                         patchBody.status = "Needs Ordered";
                                     }
-                                    const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+                                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
                                         method: "PATCH",
                                         headers: { "Content-Type": "application/json" },
                                         body: JSON.stringify(patchBody)

@@ -14,7 +14,7 @@ function ItemDetail({ type }) {
     useEffect(() => {
         const fetchItem = async () => {
             try {
-                const url = `http://localhost:5050/api/catalog/${id}`;
+                const url = `${import.meta.env.VITE_API_URL}/api/catalog/${id}`;
                 const res = await fetch(url);
                 if (!res.ok) throw new Error("Item not found");
                 const data = await res.json();
@@ -35,7 +35,7 @@ function ItemDetail({ type }) {
     };
 
     const handleEditSave = async () => {
-        const url = `http://localhost:5050/api/catalog/${id}`;
+        const url = `${import.meta.env.VITE_API_URL}/api/catalog/${id}`;
         const res = await fetch(url, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ function ItemDetail({ type }) {
                                     style={{ background: '#fbc02d', color: '#222', fontWeight: 500 }}
                                     onClick={async () => {
                                         // Undo: set status to Needs Ordered
-                                        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}/status`, {
+                                        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}/status`, {
                                             method: "PATCH",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify({ status: "Needs Ordered" })
@@ -97,14 +97,14 @@ function ItemDetail({ type }) {
                                     onClick={async () => {
                                         // Set severity to Good, update delivered_on, and reset status to Needs Ordered
                                         const now = new Date().toISOString();
-                                        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+                                        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
                                             method: "PATCH",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
                                         });
                                         if (res.ok) {
                                             // Re-fetch the item to ensure state is up to date
-                                            const refetch = await fetch(`http://localhost:5050/api/catalog/${item.id}`);
+                                            const refetch = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`);
                                             if (refetch.ok) {
                                                 const updated = await refetch.json();
                                                 setItem(updated);

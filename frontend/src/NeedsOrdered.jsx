@@ -10,7 +10,7 @@ function NeedsOrdered() {
     const [filterSeverity, setFilterSeverity] = useState("");
 
     const fetchItems = async () => {
-        const res = await fetch("http://localhost:5050/api/catalog");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`);
         let data = await res.json();
         data = Array.isArray(data)
             ? data.filter(
@@ -114,7 +114,7 @@ function NeedsOrdered() {
                                             style={{ background: '#fbc02d', color: '#222', fontWeight: 500 }}
                                             onClick={async () => {
                                                 // Undo: set status to Needs Ordered
-                                                const res = await fetch(`http://localhost:5050/api/catalog/${item.id}/status`, {
+                                                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}/status`, {
                                                     method: "PATCH",
                                                     headers: { "Content-Type": "application/json" },
                                                     body: JSON.stringify({ status: "Needs Ordered" })
@@ -130,7 +130,7 @@ function NeedsOrdered() {
                                             onClick={async () => {
                                                 // Set severity to Good and update delivered_on timestamp
                                                 const now = new Date().toISOString();
-                                                const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+                                                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
                                                     method: "PATCH",
                                                     headers: { "Content-Type": "application/json" },
                                                     body: JSON.stringify({ severity: "Good", delivered_on: now })
