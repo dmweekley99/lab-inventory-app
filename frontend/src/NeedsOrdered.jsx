@@ -65,24 +65,30 @@ function NeedsOrdered() {
                     <div style={{ color: "#b0b3b8" }}>No items need ordering.</div>
                 )}
                 {filteredItems.map((item) => (
-                    <div className="inventory-card" key={item.id}>
-                        <Link
-                            to={item.material_id ? `/catalog/${item.id}` : "#"}
-                            style={{ textDecoration: "none", color: "inherit" }}
-                        >
-                            <div className="card-title">
-                                {item.custom_material_name || item.name}
-                            </div>
-                            <div className="card-severity">
-                                Severity: {item.severity || "N/A"}
-                            </div>
-                            <div className="card-location">
-                                Location: {item.location || "N/A"}
-                            </div>
-                            <div className="card-catalog-number">
-                                Catalog Number: {item.catalog_number || item.catalog_number === "" ? item.catalog_number : (item.catalog_number === undefined ? (item.name ? "N/A" : "") : "N/A")}
-                            </div>
-                        </Link>
+                    <div
+                        className="inventory-card"
+                        key={item.id}
+                        style={{ cursor: 'pointer' }}
+                        onClick={e => {
+                            // Prevent navigation if a button or link is clicked
+                            if (
+                                e.target.tagName === 'BUTTON' ||
+                                e.target.tagName === 'A' ||
+                                e.target.closest('button') ||
+                                e.target.closest('a')
+                            ) return;
+                            window.location.href = `/catalog/${item.id}`;
+                        }}
+                    >
+                        <div className="card-title">
+                            {item.custom_material_name || item.name}
+                        </div>
+                        <div className="card-severity">
+                            Severity: {item.severity || "N/A"}
+                        </div>
+                        <div className="card-catalog-number">
+                            Catalog Number: {item.catalog_number || item.catalog_number === "" ? item.catalog_number : (item.catalog_number === undefined ? (item.name ? "N/A" : "") : "N/A")}
+                        </div>
                         <div className="card-url">
                             URL: {item.purchase_url ? (
                                 <a href={item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`} target="_blank" rel="noopener noreferrer">{item.purchase_url}</a>
@@ -90,6 +96,11 @@ function NeedsOrdered() {
                                 "N/A"
                             )}
                         </div>
+                        {item.ordered_on && (
+                            <div style={{ color: '#388e3c', fontWeight: 500, marginBottom: 4 }}>
+                                Last Ordered On: {new Date(item.ordered_on).toLocaleString()}
+                            </div>
+                        )}
                         <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                             {item.status && item.status.startsWith('Ordered by') ? (
                                 <>
@@ -111,19 +122,20 @@ function NeedsOrdered() {
                                             }}
                                         >Undo</button>
                                         <button
-                                            style={{ background: '#d32f2f', color: '#fff', fontWeight: 500 }}
+                                            style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}
                                             onClick={async () => {
-                                                // Set severity to Good instead of deleting
+                                                // Set severity to Good and update delivered_on timestamp
+                                                const now = new Date().toISOString();
                                                 const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
                                                     method: "PATCH",
                                                     headers: { "Content-Type": "application/json" },
-                                                    body: JSON.stringify({ severity: "Good" })
+                                                    body: JSON.stringify({ severity: "Good", delivered_on: now })
                                                 });
                                                 if (res.ok) {
                                                     fetchItems();
                                                 }
                                             }}
-                                        >Delete</button>
+                                        >Received</button>
                                     </div>
                                 </>
                             ) : (
