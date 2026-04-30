@@ -19,7 +19,7 @@ function App() {
           path="/"
           element={
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "4rem" }}>
-              <h1>Lab Inventory App</h1>
+              <h1>Lab Inventory</h1>
               <div style={{ display: "flex", gap: "2rem", marginTop: "2.5rem" }}>
                 <button className="home-nav-btn" onClick={() => navigate("/catalog")}>Inventory Catalog</button>
                 <button className="home-nav-btn" onClick={() => navigate("/needs-ordered")}>Needs Ordered</button>
