@@ -122,7 +122,7 @@ app.patch("/api/catalog/:id", async (req, res) => {
     const { id } = req.params;
     const fields = req.body;
     console.log("PATCH /api/catalog/:id body:", fields);
-    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status"];
+    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status","ordered_on", "delivered_on"];
     const updates = [];
     const values = [];
     let idx = 1;
