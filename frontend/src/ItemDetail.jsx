@@ -52,6 +52,11 @@ function ItemDetail({ type }) {
     if (error) return <div>Error: {error}</div>;
     if (!item) return <div>No item found.</div>;
 
+    const handleOrdered = (updatedItem) => {
+        setItem(updatedItem);
+        window.dispatchEvent(new Event('catalog-updated'));
+    };
+
     return (
         <div className="item-detail-container">
             <Link to="/">&larr; Back to Home</Link>
@@ -65,6 +70,56 @@ function ItemDetail({ type }) {
                     <span role="img" aria-label="edit">✏️</span>
                 </button>
             </div>
+            {item && (
+                <div style={{ margin: '16px 0', minWidth: 160, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                    {item.status && item.status.startsWith('Ordered by') ? (
+                        <>
+                            <span style={{ color: 'green', fontWeight: 500 }}>{item.status}</span>
+                            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                                <button
+                                    style={{ background: '#fbc02d', color: '#222', fontWeight: 500 }}
+                                    onClick={async () => {
+                                        // Undo: set status to Needs Ordered
+                                        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}/status`, {
+                                            method: "PATCH",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ status: "Needs Ordered" })
+                                        });
+                                        if (res.ok) {
+                                            const updated = await res.json();
+                                            setItem(updated);
+                                            window.dispatchEvent(new Event('catalog-updated'));
+                                        }
+                                    }}
+                                >Undo</button>
+                                <button
+                                    style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}
+                                    onClick={async () => {
+                                        // Set severity to Good, update delivered_on, and reset status to Needs Ordered
+                                        const now = new Date().toISOString();
+                                        const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+                                            method: "PATCH",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
+                                        });
+                                        if (res.ok) {
+                                            // Re-fetch the item to ensure state is up to date
+                                            const refetch = await fetch(`http://localhost:5050/api/catalog/${item.id}`);
+                                            if (refetch.ok) {
+                                                const updated = await refetch.json();
+                                                setItem(updated);
+                                            }
+                                            window.dispatchEvent(new Event('catalog-updated'));
+                                        }
+                                    }}
+                                >Received</button>
+                            </div>
+                        </>
+                    ) : (
+                        <OrderedButton item={item} onOrdered={handleOrdered} />
+                    )}
+                </div>
+            )}
             <div className="item-detail-card">
                 {editMode ? (
                     <>
@@ -125,6 +180,9 @@ function ItemDetail({ type }) {
                         ) : null}
                         {item.severity && (
                             <p><strong>Severity:</strong> {item.severity}</p>
+                        )}
+                        {item.ordered_by && (
+                            <p><strong>Ordered By:</strong> {item.ordered_by}</p>
                         )}
                         {item.notes && (
                             <p><strong>Notes:</strong> {item.notes}</p>

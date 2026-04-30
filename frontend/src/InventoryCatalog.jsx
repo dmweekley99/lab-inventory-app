@@ -96,6 +96,7 @@ function InventoryCatalog() {
                 default_location: form.default_location,
                 preferred_vendor: form.preferred_vendor,
                 purchase_url: form.purchase_url,
+                notes: form.notes,
             }),
         });
 
@@ -113,6 +114,7 @@ function InventoryCatalog() {
             default_location: "",
             preferred_vendor: "",
             purchase_url: "",
+            notes: "",
         });
     };
 
@@ -195,6 +197,14 @@ function InventoryCatalog() {
                     value={form.purchase_url}
                     onChange={handleChange}
                     placeholder="Purchase URL"
+                />
+                <input
+                    id="catalog-notes"
+                    name="notes"
+                    autoComplete="off"
+                    value={form.notes}
+                    onChange={handleChange}
+                    placeholder="Notes"
                 />
                 <button type="submit">Add Item</button>
             </form>
