@@ -199,7 +199,24 @@ function InventoryCatalog() {
                 style={{ marginRight: 8 }} />
         </div><h3>All Items</h3><div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
-                    <div className="inventory-card" key={item.id}>
+                    <div className="inventory-card" key={item.id} style={{ position: 'relative' }}>
+                        <button
+                            title="Delete"
+                            style={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: 20,
+                                color: '#d32f2f',
+                                zIndex: 2
+                            }}
+                            onClick={() => handleDelete(item)}
+                        >
+                            <span role="img" aria-label="delete">🗑️</span>
+                        </button>
                         <Link to={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                             <div className="card-title">{item.name}</div>
                             <div className="card-severity">
