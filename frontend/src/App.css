@@ -46,11 +46,24 @@
 }
 
 /* Inventory Catalog Cards */
+
 .inventory-catalog-cards {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  justify-content: center;
+}
+
+/* For InventoryRequests page */
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
 }
 
 .inventory-card {

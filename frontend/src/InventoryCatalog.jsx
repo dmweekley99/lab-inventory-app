@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function InventoryCatalog() {
     const location = useLocation();
@@ -61,28 +61,6 @@ function InventoryCatalog() {
 
     // The rest of the component remains unchanged
 
-    const handleRequest = async (item) => {
-        const res = await fetch("http://localhost:5050/api/requests", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                custom_material_name: item.name,
-                location: item.location || item.default_location || "",
-                severity: item.severity || "",
-                notes: item.notes || "",
-                submitted_by: "Catalog Quick Add",
-            }),
-        });
-
-        if (!res.ok) {
-            console.error("Failed to create request");
-            return;
-        }
-
-        window.location.href = "/requests";
-    };
 
     const handleDelete = async (item) => {
         const confirm1 = window.confirm(
@@ -154,7 +132,7 @@ function InventoryCatalog() {
     });
 
     return (
-        <div className="inventory-catalog">
+        <><div className="inventory-catalog">
             <h1>Inventory Catalog</h1>
 
             <form onSubmit={handleSubmit} className="inventory-form">
@@ -165,8 +143,7 @@ function InventoryCatalog() {
                     value={form.name}
                     onChange={handleChange}
                     placeholder="Item Name"
-                    required
-                />
+                    required />
                 <input
                     id="catalog-number"
                     name="catalog_number"
@@ -174,8 +151,7 @@ function InventoryCatalog() {
                     value={form.catalog_number}
                     onChange={handleChange}
                     placeholder="Catalog Number"
-                    required
-                />
+                    required />
                 <select
                     id="catalog-severity"
                     name="severity"
@@ -197,43 +173,34 @@ function InventoryCatalog() {
                     value={form.default_location}
                     onChange={handleChange}
                     placeholder="Default Location"
-                    required
-                />
+                    required />
                 <input
                     id="catalog-preferred-vendor"
                     name="preferred_vendor"
                     autoComplete="off"
                     value={form.preferred_vendor}
                     onChange={handleChange}
-                    placeholder="Preferred Vendor"
-                />
+                    placeholder="Preferred Vendor" />
                 <input
                     id="catalog-purchase-url"
                     name="purchase_url"
                     autoComplete="off"
                     value={form.purchase_url}
                     onChange={handleChange}
-                    placeholder="Purchase URL"
-                />
+                    placeholder="Purchase URL" />
                 <button type="submit">Add Item</button>
             </form>
 
-            <div style={{ margin: "1em 0" }}>
-                <input
-                    type="text"
-                    placeholder="Filter by name..."
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    style={{ marginRight: 8 }}
-                />
-            </div>
-
-            <h3>All Items</h3>
-
-            <div className="inventory-catalog-cards">
+            <input
+                type="text"
+                placeholder="Filter by name..."
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                style={{ marginRight: 8 }} />
+        </div><h3>All Items</h3><div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
                     <div className="inventory-card" key={item.id}>
-                        <a href={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                        <Link to={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                             <div className="card-title">{item.name}</div>
                             <div className="card-severity">
                                 Severity: {item.severity || "N/A"}
@@ -242,40 +209,53 @@ function InventoryCatalog() {
                                 Location: {item.location || item.default_location || "N/A"}
                             </div>
                             {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
-                        </a>
-                        <div className="card-actions">
-                            <button onClick={() => handleRequest(item)}>Request This</button>
+                        </Link>
+                        {item.purchase_url && (
+                            <div className="card-url">
+                                <a href={item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`} target="_blank" rel="noopener noreferrer">
+                                    {item.purchase_url}
+                                </a>
+                            </div>
+                        )}
+                        <div className="card-severity">
+                            <label htmlFor={`severity-select-${item.id}`}>Severity: </label>
+                            <select
+                                id={`severity-select-${item.id}`}
+                                name={`severity-select-${item.id}`}
+                                value={item.severity || ""}
+                                onChange={async (e) => {
+                                    const newSeverity = e.target.value;
+                                    let patchBody = { severity: newSeverity };
+                                    if (["Low", "Very Low", "Critical"].includes(newSeverity)) {
+                                        patchBody.status = "Needs Ordered";
+                                    }
+                                    const res = await fetch(`http://localhost:5050/api/catalog/${item.id}`, {
+                                        method: "PATCH",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify(patchBody)
+                                    });
+                                    if (res.ok) {
+                                        const updated = await res.json();
+                                        // Refetch catalog and force reload NeedsOrdered page to guarantee sync
+                                        await fetchCatalog();
+                                        if (window.location.pathname === '/needs-ordered') {
+                                            window.location.reload();
+                                        } else {
+                                            window.dispatchEvent(new Event('catalog-updated'));
+                                        }
+                                    }
+                                }}
+                            >
+                                <option value="Good">Good</option>
+                                <option value="Low">Low</option>
+                                <option value="Very Low">Very Low</option>
+                                <option value="Critical">Critical</option>
+                            </select>
                         </div>
                     </div>
                 ))}
             </div>
-
-            <h3>Low Inventory Items</h3>
-
-            <div className="inventory-catalog-cards">
-                {lowItems.length === 0 && (
-                    <div style={{ color: "#b0b3b8" }}>No low inventory items.</div>
-                )}
-
-                {lowItems.map((item) => (
-                    <div className="inventory-card" key={item.id}>
-                        <a href={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                            <div className="card-title">{item.name}</div>
-                            <div className="card-severity">
-                                Severity: {item.severity || "N/A"}
-                            </div>
-                            <div className="card-location">
-                                Location: {item.location || item.default_location || "N/A"}
-                            </div>
-                            {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
-                        </a>
-                        <div className="card-actions">
-                            <button onClick={() => handleRequest(item)}>Request This</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+        </>
     );
 }
 export default InventoryCatalog;
