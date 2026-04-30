@@ -90,16 +90,17 @@ app.post("/api/catalog", async (req, res) => {
       default_location,
       preferred_vendor,
       purchase_url,
+      notes,
     } = req.body;
 
     let result;
     try {
       result = await pool.query(
         `INSERT INTO material_catalog
-        (name, catalog_number, severity, default_location, preferred_vendor, purchase_url)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        (name, catalog_number, severity, default_location, preferred_vendor, purchase_url, notes)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *`,
-        [name, catalog_number, severity, default_location, preferred_vendor, purchase_url]
+        [name, catalog_number, severity, default_location, preferred_vendor, purchase_url, notes]
       );
     } catch (err) {
       console.error("Error during INSERT INTO material_catalog:", err);
@@ -121,8 +122,14 @@ app.patch("/api/catalog/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const fields = req.body;
+    // Ensure notes is always a string, never null
+    if (fields.notes === null) fields.notes = "";
+    // Reset notes if severity is set to Good
+    if (fields.severity === "Good") {
+      fields.notes = "";
+    }
     console.log("PATCH /api/catalog/:id body:", fields);
-    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status", "ordered_on", "delivered_on", "ordered_by"];
+    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status", "ordered_on", "delivered_on", "ordered_by", "notes"];
     const updates = [];
     const values = [];
     let idx = 1;

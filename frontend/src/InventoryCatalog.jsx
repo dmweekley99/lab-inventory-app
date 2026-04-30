@@ -157,7 +157,6 @@ function InventoryCatalog() {
                     value={form.catalog_number}
                     onChange={handleChange}
                     placeholder="Catalog Number"
-                    required
                 />
                 <select
                     id="catalog-severity"

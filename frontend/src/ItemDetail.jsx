@@ -145,10 +145,10 @@ function ItemDetail({ type }) {
                                 <input name="notes" value={editForm.notes || ""} onChange={handleEditChange} />
                             </div>
                         )}
-                        {editForm.submitted_by !== undefined && (
+                        {editForm.ordered_by !== undefined && (
                             <div style={{ marginBottom: 12 }}>
-                                <label><strong>Submitted By: </strong></label>
-                                <input name="submitted_by" value={editForm.submitted_by || ""} onChange={handleEditChange} />
+                                <label><strong>Ordered By: </strong></label>
+                                <input name="ordered_by" value={editForm.ordered_by || ""} onChange={handleEditChange} />
                             </div>
                         )}
                         {editForm.catalog_number !== undefined && (
@@ -181,10 +181,10 @@ function ItemDetail({ type }) {
                         {item.severity && (
                             <p><strong>Severity:</strong> {item.severity}</p>
                         )}
-                        {item.ordered_by && (
-                            <p><strong>Ordered By:</strong> {item.ordered_by}</p>
+                        {item.ordered_by && item.ordered_by.trim() !== "" && (
+                            <p><strong>Last Ordered By:</strong> {item.ordered_by}</p>
                         )}
-                        {item.notes && (
+                        {item.notes && item.notes.trim() !== "" && (
                             <p><strong>Notes:</strong> {item.notes}</p>
                         )}
                         {item.submitted_by && (
