@@ -18,27 +18,42 @@ function InventoryCatalog() {
 
 
     const fetchCatalog = async () => {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`);
-        const data = await res.json();
-
-        setItems(
-            data.map((item) => {
-                let severity = item.severity;
-
-                if (!severity && item.notes) {
-                    try {
-                        const notesObj = JSON.parse(item.notes);
-                        if (notesObj && notesObj.severity) {
-                            severity = notesObj.severity;
+        const token = localStorage.getItem("token");
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+            const data = await res.json();
+            console.log("Catalog API response:", data);
+            if (Array.isArray(data)) {
+                setItems(
+                    data.map((item) => {
+                        let severity = item.severity;
+                        if (!severity && item.notes) {
+                            try {
+                                const notesObj = JSON.parse(item.notes);
+                                if (notesObj && notesObj.severity) {
+                                    severity = notesObj.severity;
+                                }
+                            } catch {
+                                // ignore invalid JSON notes
+                            }
                         }
-                    } catch {
-                        // ignore invalid JSON notes
-                    }
+                        return { ...item, severity };
+                    })
+                );
+            } else {
+                setItems([]);
+                if (data && data.error) {
+                    console.error("Catalog fetch error:", data.error);
+                } else {
+                    console.error("Catalog API did not return an array.", data);
                 }
-
-                return { ...item, severity };
-            })
-        );
+            }
+        } catch (err) {
+            setItems([]);
+            console.error("Failed to fetch catalog:", err);
+        }
     };
 
     // Prefill form from query params if present
