@@ -275,9 +275,13 @@ function InventoryCatalog() {
                                     if (["Low", "Very Low", "Critical"].includes(newSeverity)) {
                                         patchBody.status = "Needs Ordered";
                                     }
+                                    const token = localStorage.getItem("token");
                                     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
                                         method: "PATCH",
-                                        headers: { "Content-Type": "application/json" },
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                        },
                                         body: JSON.stringify(patchBody)
                                     });
                                     if (res.ok) {
