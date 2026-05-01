@@ -62,13 +62,6 @@ function ItemDetail({ type }) {
             <Link to="/">&larr; Back to Home</Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <h1 style={{ marginBottom: 0 }}>Item Details</h1>
-                <button
-                    title="Edit"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22 }}
-                    onClick={() => setEditMode((m) => !m)}
-                >
-                    <span role="img" aria-label="edit">✏️</span>
-                </button>
             </div>
             {item && (
                 <div style={{ margin: '16px 0', minWidth: 160, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
@@ -121,12 +114,27 @@ function ItemDetail({ type }) {
                 </div>
             )}
             <div className="item-detail-card">
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: 40, marginBottom: 8 }}>
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        {editMode ? (
+                            <div style={{ marginBottom: 0, marginRight: 8 }}>
+                                <label><strong>Name: </strong></label>
+                                <input name="custom_material_name" value={editForm.custom_material_name || editForm.name || ""} onChange={handleEditChange} />
+                            </div>
+                        ) : (
+                            <h2 style={{ marginBottom: 0, textAlign: 'center' }}>{item.custom_material_name || item.name}</h2>
+                        )}
+                    </div>
+                    <button
+                        title="Edit"
+                        style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 22 }}
+                        onClick={() => setEditMode((m) => !m)}
+                    >
+                        <span role="img" aria-label="edit">✏️</span>
+                    </button>
+                </div>
                 {editMode ? (
                     <>
-                        <div style={{ marginBottom: 12 }}>
-                            <label><strong>Name: </strong></label>
-                            <input name="custom_material_name" value={editForm.custom_material_name || editForm.name || ""} onChange={handleEditChange} />
-                        </div>
                         {editForm.default_location !== undefined && (
                             <div style={{ marginBottom: 12 }}>
                                 <label><strong>Location: </strong></label>
@@ -136,19 +144,18 @@ function ItemDetail({ type }) {
                         {editForm.severity !== undefined && (
                             <div style={{ marginBottom: 12 }}>
                                 <label><strong>Severity: </strong></label>
-                                <input name="severity" value={editForm.severity || ""} onChange={handleEditChange} />
+                                <select name="severity" value={editForm.severity || ""} onChange={handleEditChange}>
+                                    <option value="Good">Good</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Very Low">Very Low</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
                             </div>
                         )}
                         {editForm.notes !== undefined && (
                             <div style={{ marginBottom: 12 }}>
                                 <label><strong>Notes: </strong></label>
                                 <input name="notes" value={editForm.notes || ""} onChange={handleEditChange} />
-                            </div>
-                        )}
-                        {editForm.ordered_by !== undefined && (
-                            <div style={{ marginBottom: 12 }}>
-                                <label><strong>Ordered By: </strong></label>
-                                <input name="ordered_by" value={editForm.ordered_by || ""} onChange={handleEditChange} />
                             </div>
                         )}
                         {editForm.catalog_number !== undefined && (
@@ -174,7 +181,6 @@ function ItemDetail({ type }) {
                     </>
                 ) : (
                     <>
-                        <h2>{item.custom_material_name || item.name}</h2>
                         {item.location || item.default_location ? (
                             <p><strong>Location:</strong> {item.location || item.default_location}</p>
                         ) : null}
