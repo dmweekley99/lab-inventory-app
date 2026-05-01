@@ -84,8 +84,10 @@ function InventoryCatalog() {
 
         if (!confirm1) return;
 
+        const token = localStorage.getItem("token");
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
             method: "DELETE",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
         if (!res.ok) {
