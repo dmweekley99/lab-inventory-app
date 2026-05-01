@@ -15,7 +15,10 @@ function ItemDetail({ type }) {
         const fetchItem = async () => {
             try {
                 const url = `${import.meta.env.VITE_API_URL}/api/catalog/${id}`;
-                const res = await fetch(url);
+                const token = localStorage.getItem("token");
+                const res = await fetch(url, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
                 if (!res.ok) throw new Error("Item not found");
                 const data = await res.json();
                 setItem(data);
