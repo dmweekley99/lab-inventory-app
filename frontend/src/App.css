@@ -1,5 +1,6 @@
 /* Main title style for headings */
-.main-title {
+.main-title,
+h1 {
   color: #fff;
   margin-bottom: 8px;
   align-self: center;
