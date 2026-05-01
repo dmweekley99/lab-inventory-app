@@ -1,7 +1,11 @@
 @media (max-width: 400px) {
   .item-detail-container {
-    padding: 0 4px;
-    margin-top: 1rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .item-detail-card {
