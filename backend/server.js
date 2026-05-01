@@ -12,9 +12,64 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+// --- AUTH ROUTES ---
+app.post("/api/auth/register", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, role",
+      [email, passwordHash]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(400).json({ error: "User already exists or invalid request" });
+  }
+});
+
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email = $1",
+    [email]
+  );
+  if (result.rows.length === 0) {
+    return res.status(401).json({ error: "Invalid login" });
+  }
+  const user = result.rows[0];
+  const validPassword = await bcrypt.compare(password, user.password_hash);
+  if (!validPassword) {
+    return res.status(401).json({ error: "Invalid login" });
+  }
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "8h" }
+  );
+  res.json({ token });
+});
+
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: "Missing token" });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = user;
+    next();
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
+  }
+}
 
 // Get a single catalog item by id
-app.get("/api/catalog/:id", async (req, res) => {
+// Get a single catalog item by id (protected)
+app.get("/api/catalog/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
@@ -32,7 +87,8 @@ app.get("/api/catalog/:id", async (req, res) => {
 });
 
 // Delete material from catalog by id
-app.delete("/api/catalog/:id", async (req, res) => {
+// Delete material from catalog by id (protected)
+app.delete("/api/catalog/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query("DELETE FROM material_catalog WHERE id = $1 RETURNING *", [id]);
@@ -47,7 +103,8 @@ app.delete("/api/catalog/:id", async (req, res) => {
 });
 
 // Get all catalog materials
-app.get("/api/catalog", async (req, res) => {
+// Get all catalog materials (protected)
+app.get("/api/catalog", requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT * FROM material_catalog ORDER BY name ASC"
@@ -60,7 +117,8 @@ app.get("/api/catalog", async (req, res) => {
 });
 
 // Update status of a catalog item
-app.patch("/api/catalog/:id/status", async (req, res) => {
+// Update status of a catalog item (protected)
+app.patch("/api/catalog/:id/status", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -80,7 +138,8 @@ app.patch("/api/catalog/:id/status", async (req, res) => {
 });
 
 // Add material to catalog
-app.post("/api/catalog", async (req, res) => {
+// Add material to catalog (protected)
+app.post("/api/catalog", requireAuth, async (req, res) => {
   try {
     console.log("POST /api/catalog called with body:", req.body);
     const {
@@ -118,7 +177,8 @@ app.post("/api/catalog", async (req, res) => {
 });
 // Update catalog item fields (e.g., severity)
 
-app.patch("/api/catalog/:id", async (req, res) => {
+// Update catalog item fields (e.g., severity) (protected)
+app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const fields = req.body;

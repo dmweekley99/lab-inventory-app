@@ -1,9 +1,19 @@
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
-import InventoryCatalog from "./InventoryCatalog";
 
+import { Routes, Route, Link, useNavigate, useLocation, Navigate } from "react-router-dom";
+import InventoryCatalog from "./InventoryCatalog";
 import ItemDetail from "./ItemDetail";
 import NeedsOrdered from "./NeedsOrdered";
+import LoginForm from "./LoginForm";
 import "./App.css";
+
+function RequireAuth({ children }) {
+  const token = localStorage.getItem("token");
+  const location = useLocation();
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+}
 
 function App() {
   const navigate = useNavigate();
@@ -16,6 +26,9 @@ function App() {
       </nav>
       <Routes>
         <Route
+          path="/login"
+          element={<LoginForm onLogin={() => navigate("/catalog")} />} />
+        <Route
           path="/"
           element={
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "4rem" }}>
@@ -27,9 +40,9 @@ function App() {
             </div>
           }
         />
-        <Route path="/catalog" element={<InventoryCatalog />} />
-        <Route path="/needs-ordered" element={<NeedsOrdered />} />
-        <Route path="/catalog/:id" element={<ItemDetail type="catalog" />} />
+        <Route path="/catalog" element={<RequireAuth><InventoryCatalog /></RequireAuth>} />
+        <Route path="/needs-ordered" element={<RequireAuth><NeedsOrdered /></RequireAuth>} />
+        <Route path="/catalog/:id" element={<RequireAuth><ItemDetail type="catalog" /></RequireAuth>} />
       </Routes>
     </div>
   );
