@@ -7,9 +7,8 @@
   .item-detail-card {
     min-width: 0;
     max-width: none;
-    width: 100vw;
-    margin-left: -4px;
-    margin-right: -4px;
+    width: 100%;
+    margin: 0;
     padding: 1rem 0.5rem;
     box-sizing: border-box;
     border-radius: 0;
