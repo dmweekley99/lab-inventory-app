@@ -33,7 +33,7 @@ function LoginForm({ onLogin }) {
 
     return (
         <form onSubmit={handleSubmit} className="login-form" style={{ maxWidth: 340, margin: "2rem auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 30, height: "fit-content", padding: 24, border: "1px solid #ccc", borderRadius: 8 }}>
-            <h2 style={{ marginBottom: 8, alignSelf: "center", color: "white" }}>Login</h2>
+            <h2 className="main-title">Login</h2>
             <input
                 id="login-email"
                 type="email"
