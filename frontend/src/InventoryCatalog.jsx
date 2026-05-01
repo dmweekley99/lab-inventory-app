@@ -157,7 +157,7 @@ function InventoryCatalog() {
 
     return (
         <><div className="inventory-catalog">
-            <h1>Inventory Catalog</h1>
+            <h1 style={color='white'}>Inventory Catalog</h1>
 
             <form onSubmit={handleSubmit} className="inventory-form">
                 <input
