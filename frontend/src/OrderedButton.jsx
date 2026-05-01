@@ -12,9 +12,13 @@ function OrderedButton({ item, onOrdered }) {
         const status = `Ordered by ${user} on ${dateStr}`;
         const ordered_on = now.toISOString();
         const ordered_by = user;
+        const token = localStorage.getItem("token");
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
             body: JSON.stringify({ status, ordered_on, ordered_by })
         });
         if (res.ok) {

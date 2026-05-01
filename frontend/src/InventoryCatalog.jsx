@@ -99,10 +99,12 @@ function InventoryCatalog() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const token = localStorage.getItem("token");
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
             body: JSON.stringify({
                 name: form.name,

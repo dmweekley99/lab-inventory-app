@@ -10,7 +10,10 @@ function NeedsOrdered() {
     const [filterSeverity, setFilterSeverity] = useState("");
 
     const fetchItems = async () => {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`);
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         let data = await res.json();
         data = Array.isArray(data)
             ? data.filter(
@@ -114,9 +117,13 @@ function NeedsOrdered() {
                                             style={{ background: '#fbc02d', color: '#222', fontWeight: 500 }}
                                             onClick={async () => {
                                                 // Undo: set status to Needs Ordered
+                                                const token = localStorage.getItem("token");
                                                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}/status`, {
                                                     method: "PATCH",
-                                                    headers: { "Content-Type": "application/json" },
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                                    },
                                                     body: JSON.stringify({ status: "Needs Ordered" })
                                                 });
                                                 if (res.ok) {
@@ -130,9 +137,13 @@ function NeedsOrdered() {
                                             onClick={async () => {
                                                 // Set severity to Good and update delivered_on timestamp
                                                 const now = new Date().toISOString();
+                                                const token = localStorage.getItem("token");
                                                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
                                                     method: "PATCH",
-                                                    headers: { "Content-Type": "application/json" },
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                                    },
                                                     body: JSON.stringify({ severity: "Good", delivered_on: now })
                                                 });
                                                 if (res.ok) {

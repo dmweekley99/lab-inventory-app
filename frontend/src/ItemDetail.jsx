@@ -39,9 +39,13 @@ function ItemDetail({ type }) {
 
     const handleEditSave = async () => {
         const url = `${import.meta.env.VITE_API_URL}/api/catalog/${id}`;
+        const token = localStorage.getItem("token");
         const res = await fetch(url, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
             body: JSON.stringify(editForm)
         });
         if (res.ok) {
@@ -76,9 +80,13 @@ function ItemDetail({ type }) {
                                     style={{ background: '#fbc02d', color: '#222', fontWeight: 500 }}
                                     onClick={async () => {
                                         // Undo: set status to Needs Ordered
+                                        const token = localStorage.getItem("token");
                                         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}/status`, {
                                             method: "PATCH",
-                                            headers: { "Content-Type": "application/json" },
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                            },
                                             body: JSON.stringify({ status: "Needs Ordered" })
                                         });
                                         if (res.ok) {
@@ -93,14 +101,20 @@ function ItemDetail({ type }) {
                                     onClick={async () => {
                                         // Set severity to Good, update delivered_on, and reset status to Needs Ordered
                                         const now = new Date().toISOString();
+                                        const token = localStorage.getItem("token");
                                         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
                                             method: "PATCH",
-                                            headers: { "Content-Type": "application/json" },
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                            },
                                             body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
                                         });
                                         if (res.ok) {
                                             // Re-fetch the item to ensure state is up to date
-                                            const refetch = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`);
+                                            const refetch = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
+                                                headers: token ? { Authorization: `Bearer ${token}` } : {},
+                                            });
                                             if (refetch.ok) {
                                                 const updated = await refetch.json();
                                                 setItem(updated);
