@@ -20,7 +20,7 @@ function App() {
           element={
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "4rem" }}>
               <h1>Lab Inventory</h1>
-              <div style={{ display: "flex", gap: "2rem", marginTop: "2.5rem" }}>
+              <div className="home-nav-btn-container" style={{ display: "flex", gap: "2rem", marginTop: "2.5rem", width: "100%", maxWidth: 400 }}>
                 <button className="home-nav-btn" onClick={() => navigate("/catalog")}>Inventory Catalog</button>
                 <button className="home-nav-btn" onClick={() => navigate("/needs-ordered")}>Needs Ordered</button>
               </div>

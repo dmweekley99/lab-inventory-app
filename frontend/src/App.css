@@ -1,3 +1,23 @@
+/* Stack home page navigation buttons vertically on mobile */
+@media (max-width: 600px) {
+  .home-nav-btn {
+    width: 100%;
+    margin: 0 0 12px 0;
+    display: block;
+  }
+
+  .home-nav-btn+.home-nav-btn {
+    margin-top: 0;
+  }
+
+  .home-nav-btn-container {
+    flex-direction: column !important;
+    gap: 0 !important;
+    width: 100%;
+    align-items: stretch !important;
+  }
+}
+
 /* Item Detail Page Styling */
 .item-detail-container {
   display: flex;
