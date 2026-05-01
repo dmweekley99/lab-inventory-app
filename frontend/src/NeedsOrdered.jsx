@@ -96,7 +96,7 @@ function NeedsOrdered() {
                         <div className="card-catalog-number">
                             Catalog Number: {item.catalog_number || item.catalog_number === "" ? item.catalog_number : (item.catalog_number === undefined ? (item.name ? "N/A" : "") : "N/A")}
                         </div>
-                        <div className="card-url">
+                        <div className="card-url url-text">
                             URL: {item.purchase_url ? (
                                 <a href={item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`} target="_blank" rel="noopener noreferrer">{item.purchase_url}</a>
                             ) : (

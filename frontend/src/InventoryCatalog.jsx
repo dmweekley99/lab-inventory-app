@@ -255,7 +255,7 @@ function InventoryCatalog() {
                             {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
                         </Link>
                         {item.purchase_url && (
-                            <div className="card-url">
+                            <div className="card-url url-text">
                                 <a href={item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`} target="_blank" rel="noopener noreferrer">
                                     {item.purchase_url}
                                 </a>
