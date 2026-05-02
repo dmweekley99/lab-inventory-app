@@ -21,8 +21,10 @@ function App() {
   if (!token) {
     // Always show login form if not authenticated, block all other routes
     return (
-      <div className="app-container">
-        <LoginForm onLogin={() => navigate("/catalog")} />
+      <div className="login-outer-container">
+        <div className="login-bg-box">
+          <LoginForm onLogin={() => navigate("/catalog")} />
+        </div>
       </div>
     );
   }

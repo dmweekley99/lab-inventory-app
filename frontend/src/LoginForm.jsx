@@ -32,7 +32,7 @@ function LoginForm({ onLogin }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="login-form" style={{ maxWidth: 340, margin: "2rem auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 30, height: "fit-content", padding: 24, border: "1px solid #ccc", borderRadius: 8 }}>
+        <form onSubmit={handleSubmit} className="login-form">
             <h2 className="main-title">Login</h2>
             <input
                 id="login-email"
@@ -42,7 +42,6 @@ function LoginForm({ onLogin }) {
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="username"
-                style={{ marginBottom: 8, width: "100%" }}
             />
             <input
                 id="login-password"
@@ -52,7 +51,6 @@ function LoginForm({ onLogin }) {
                 onChange={e => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                style={{ marginBottom: 12, width: "100%" }}
             />
             <button type="submit" disabled={loading} style={{ alignSelf: "stretch" }}>{loading ? "Logging in..." : "Login"}</button>
             {error && <div style={{ color: "#b00020", marginTop: 8 }}>{error}</div>}
