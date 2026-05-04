@@ -67,7 +67,6 @@ function requireAuth(req, res, next) {
   }
 }
 
-// Get a single catalog item by id
 // Get a single catalog item by id (protected)
 app.get("/api/catalog/:id", requireAuth, async (req, res) => {
   try {
@@ -86,7 +85,6 @@ app.get("/api/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
-// Delete material from catalog by id
 // Delete material from catalog by id (protected)
 app.delete("/api/catalog/:id", requireAuth, async (req, res) => {
   try {
@@ -102,7 +100,6 @@ app.delete("/api/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
-// Get all catalog materials
 // Get all catalog materials (protected)
 app.get("/api/catalog", requireAuth, async (req, res) => {
   try {
@@ -116,7 +113,6 @@ app.get("/api/catalog", requireAuth, async (req, res) => {
   }
 });
 
-// Update status of a catalog item
 // Update status of a catalog item (protected)
 app.patch("/api/catalog/:id/status", requireAuth, async (req, res) => {
   try {
@@ -137,7 +133,6 @@ app.patch("/api/catalog/:id/status", requireAuth, async (req, res) => {
   }
 });
 
-// Add material to catalog
 // Add material to catalog (protected)
 app.post("/api/catalog", requireAuth, async (req, res) => {
   try {
@@ -175,7 +170,6 @@ app.post("/api/catalog", requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// Update catalog item fields (e.g., severity)
 
 // Update catalog item fields (e.g., severity) (protected)
 app.patch("/api/catalog/:id", requireAuth, async (req, res) => {

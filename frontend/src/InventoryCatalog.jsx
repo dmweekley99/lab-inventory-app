@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import api from "./api";
 
 function InventoryCatalog() {
     const location = useLocation();
@@ -18,12 +19,9 @@ function InventoryCatalog() {
 
 
     const fetchCatalog = async () => {
-        const token = localStorage.getItem("token");
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`, {
-                headers: token ? { Authorization: `Bearer ${token}` } : {},
-            });
-            const data = await res.json();
+            const res = await api.get("/api/catalog");
+            const data = res.data;
             console.log("Catalog API response:", data);
             if (Array.isArray(data)) {
                 setItems(

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import {useState} from "react";
+import { useAuth } from "./AuthContext";
 
 function LoginForm({ onLogin }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,7 +24,7 @@ function LoginForm({ onLogin }) {
                 setLoading(false);
                 return;
             }
-            localStorage.setItem("token", data.token);
+            login(data.token);
             if (onLogin) onLogin();
         } catch (err) {
             setError("Network error");

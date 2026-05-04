@@ -1,29 +1,23 @@
-
-
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import InventoryCatalog from "./InventoryCatalog";
 import ItemDetail from "./ItemDetail";
 import NeedsOrdered from "./NeedsOrdered";
 import LoginForm from "./LoginForm";
+import { useAuth } from "./AuthContext";
 import "./App.css";
 
 
 
 function App() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const { isAuthenticated, logout } = useAuth();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
-  };
-
-  if (!token) {
+  if (!isAuthenticated) {
     // Always show login form if not authenticated, block all other routes
     return (
       <div className="login-outer-container">
         <div className="login-bg-box">
-          <LoginForm onLogin={() => navigate("/catalog")} />
+          <LoginForm onLogin={() => navigate("/")} />
         </div>
       </div>
     );
@@ -32,7 +26,7 @@ function App() {
   return (
     <div className="app-container" style={{ position: "relative" }}>
       <button
-        onClick={handleLogout}
+        onClick={logout}
         style={{
           position: "absolute",
           top: 12,

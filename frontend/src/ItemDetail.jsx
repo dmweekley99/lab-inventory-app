@@ -1,7 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import OrderedButton from "./OrderedButton";
+import api from "./api";
 
 function ItemDetail({ type }) {
     const { id } = useParams();
@@ -14,13 +14,8 @@ function ItemDetail({ type }) {
     useEffect(() => {
         const fetchItem = async () => {
             try {
-                const url = `${import.meta.env.VITE_API_URL}/api/catalog/${id}`;
-                const token = localStorage.getItem("token");
-                const res = await fetch(url, {
-                    headers: token ? { Authorization: `Bearer ${token}` } : {},
-                });
-                if (!res.ok) throw new Error("Item not found");
-                const data = await res.json();
+                const res = await api.get(`/api/catalog/${id}`);
+                const data = res.data;
                 setItem(data);
                 setEditForm(data);
             } catch (err) {
@@ -38,20 +33,14 @@ function ItemDetail({ type }) {
     };
 
     const handleEditSave = async () => {
-        const url = `${import.meta.env.VITE_API_URL}/api/catalog/${id}`;
-        const token = localStorage.getItem("token");
-        const res = await fetch(url, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify(editForm)
-        });
-        if (res.ok) {
-            const updated = await res.json();
-            setItem(updated);
-            setEditMode(false);
+        try {
+            const res = await api.patch(`/api/catalog/${id}`, editForm);
+            if (res.status === 200) {
+                setItem(res.data);
+                setEditMode(false);
+            }
+        } catch (err) {
+            setError("Failed to update item");
         }
     };
 

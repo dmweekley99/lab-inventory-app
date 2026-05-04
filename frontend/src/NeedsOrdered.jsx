@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import OrderedButton from "./OrderedButton";
 import DownloadCSVButton from "./DownloadCSVButton";
+import api from "./api";
 import "./App.css";
 
 function NeedsOrdered() {
@@ -10,21 +11,23 @@ function NeedsOrdered() {
     const [filterSeverity, setFilterSeverity] = useState("");
 
     const fetchItems = async () => {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        let data = await res.json();
-        data = Array.isArray(data)
-            ? data.filter(
-                (item) =>
-                    (item.status === "Needs Ordered" || !item.status) &&
-                    (item.severity === "Low" ||
-                        item.severity === "Very Low" ||
-                        item.severity === "Critical")
-            )
-            : [];
-        setItems(data);
+        try {
+            const res = await api.get("/api/catalog");
+            let data = res.data;
+            data = Array.isArray(data)
+                ? data.filter(
+                    (item) =>
+                        (item.status === "Needs Ordered" || !item.status) &&
+                        (item.severity === "Low" ||
+                            item.severity === "Very Low" ||
+                            item.severity === "Critical")
+                )
+                : [];
+            setItems(data);
+        } catch (err) {
+            setItems([]);
+            console.error("Failed to fetch items:", err);
+        }
     };
     useEffect(() => {
         fetchItems();
