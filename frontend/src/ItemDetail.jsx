@@ -125,10 +125,10 @@ function ItemDetail({ type }) {
                         {editMode ? (
                             <div style={{ marginBottom: 0, marginRight: 8 }}>
                                 <label><strong>Name: </strong></label>
-                                <input name="custom_material_name" value={editForm.custom_material_name || editForm.name || ""} onChange={handleEditChange} />
+                                <input name="name" value={editForm.name || ""} onChange={handleEditChange} />
                             </div>
                         ) : (
-                            <h2 style={{ marginBottom: 0, textAlign: 'center' }}>{item.custom_material_name || item.name}</h2>
+                            <h2 style={{ marginBottom: 0, textAlign: 'center' }}>{item.name}</h2>
                         )}
                     </div>
                     <button
