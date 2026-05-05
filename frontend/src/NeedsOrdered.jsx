@@ -123,6 +123,7 @@ function NeedsOrdered() {
                                 "N/A"
                             )}
                         </div>
+                        {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
                         {item.ordered_on && (
                             <div style={{ color: '#388e3c', fontWeight: 500, marginBottom: 4 }}>
                                 Last Ordered On: {new Date(item.ordered_on).toLocaleString()}

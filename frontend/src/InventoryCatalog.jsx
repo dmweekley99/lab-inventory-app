@@ -252,7 +252,6 @@ function InventoryCatalog() {
                             <div className="card-location">
                                 Location: {item.location || item.default_location || "N/A"}
                             </div>
-                            {item.notes && <div className="card-notes">Notes: {item.notes}</div>}
                         </Link>
                         {item.purchase_url && (
                             <div className="card-url url-text">
