@@ -214,6 +214,8 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
       return res.status(404).json({ error: "Catalog item not found" });
     }
     console.log("PATCH /api/catalog/:id updated row:", result.rows[0]);
+    // Emit real-time update for any item change (undo, received, etc)
+    emitItemOrdered(result.rows[0]);
     res.json(result.rows[0]);
   } catch (err) {
     console.error("PATCH /api/catalog/:id error:", err);

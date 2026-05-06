@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import OrderedButton from "./OrderedButton";
 import api from "./api";
+import socket from "./socket";
 
 function ItemDetail({ type }) {
     const { id } = useParams();
@@ -25,6 +26,17 @@ function ItemDetail({ type }) {
             }
         };
         fetchItem();
+
+        // Listen for real-time updates to this item
+        const handleItemOrdered = (updated) => {
+            if (updated && updated.id && String(updated.id) === String(id)) {
+                setItem(updated);
+            }
+        };
+        socket.on("itemOrdered", handleItemOrdered);
+        return () => {
+            socket.off("itemOrdered", handleItemOrdered);
+        };
     }, [id]);
 
 
