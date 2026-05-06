@@ -12,6 +12,12 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// --- SOCKET.IO ---
+const http = require('http');
+const server = http.createServer(app);
+const { initSocket, emitItemOrdered } = require('./socket');
+initSocket(server);
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -126,6 +132,8 @@ app.patch("/api/catalog/:id/status", requireAuth, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Catalog item not found" });
     }
+    // Emit real-time update to all clients
+    emitItemOrdered(result.rows[0]);
     res.json(result.rows[0]);
   } catch (err) {
     console.error("PATCH /api/catalog/:id/status error:", err);
@@ -213,4 +221,6 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 5050);
+server.listen(process.env.PORT || 5050, () => {
+  console.log('Server and Socket.IO listening on port', process.env.PORT || 5050);
+});
