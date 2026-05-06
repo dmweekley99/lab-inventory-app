@@ -100,7 +100,8 @@ function ItemDetail({ type }) {
                                 <button
                                     style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}
                                     onClick={async () => {
-                                        // Set severity to Good, update delivered_on, and reset status to Needs Ordered
+                                        const receivedBy = window.prompt("Who received this item?");
+                                        if (!receivedBy) return;
                                         const now = new Date().toISOString();
                                         const token = localStorage.getItem("token");
                                         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
@@ -109,7 +110,7 @@ function ItemDetail({ type }) {
                                                 "Content-Type": "application/json",
                                                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
                                             },
-                                            body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
+                                            body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered", received_by: receivedBy })
                                         });
                                         if (res.ok) {
                                             // Re-fetch the item to ensure state is up to date
@@ -207,6 +208,9 @@ function ItemDetail({ type }) {
                         )}
                         {item.ordered_by && item.ordered_by.trim() !== "" && (
                             <p><strong>Last Ordered By:</strong> {item.ordered_by}</p>
+                        )}
+                        {item.received_by && item.received_by.trim() !== "" && (
+                            <p><strong>Last Received By:</strong> {item.received_by}</p>
                         )}
                         {item.notes && item.notes.trim() !== "" && (
                             <p><strong>Notes:</strong> {item.notes}</p>

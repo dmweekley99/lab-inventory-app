@@ -191,7 +191,7 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
       fields.notes = "";
     }
     console.log("PATCH /api/catalog/:id body:", fields);
-    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status", "ordered_on", "delivered_on", "ordered_by", "notes"];
+    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status", "ordered_on", "delivered_on", "ordered_by", "received_by", "notes"];
     const updates = [];
     const values = [];
     let idx = 1;

@@ -48,6 +48,8 @@ function PendingOrders() {
     }, []);
 
     const handleReceived = async (item) => {
+        const receivedBy = window.prompt("Who received this item?");
+        if (!receivedBy) return;
         const now = new Date().toISOString();
         const token = localStorage.getItem("token");
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
@@ -56,7 +58,7 @@ function PendingOrders() {
                 "Content-Type": "application/json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
+            body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered", received_by: receivedBy })
         });
         if (res.ok) {
             fetchPending();

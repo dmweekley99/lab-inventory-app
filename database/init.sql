@@ -16,6 +16,7 @@ CREATE TABLE material_catalog (
   purchase_url TEXT,
   notes TEXT,
   ordered_by TEXT,
+  received_by TEXT,
   status TEXT DEFAULT 'Needs Ordered',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ordered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

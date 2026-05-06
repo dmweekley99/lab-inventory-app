@@ -175,7 +175,8 @@ function NeedsOrdered() {
                                         <button
                                             style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}
                                             onClick={async () => {
-                                                // Set severity to Good and update delivered_on timestamp
+                                                const receivedBy = window.prompt("Who received this item?");
+                                                if (!receivedBy) return;
                                                 const now = new Date().toISOString();
                                                 const token = localStorage.getItem("token");
                                                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
@@ -184,7 +185,7 @@ function NeedsOrdered() {
                                                         "Content-Type": "application/json",
                                                         ...(token ? { Authorization: `Bearer ${token}` } : {}),
                                                     },
-                                                    body: JSON.stringify({ severity: "Good", delivered_on: now })
+                                                    body: JSON.stringify({ severity: "Good", delivered_on: now, received_by: receivedBy })
                                                 });
                                                 if (res.ok) {
                                                     fetchItems();
