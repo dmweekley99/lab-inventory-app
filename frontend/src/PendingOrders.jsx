@@ -4,83 +4,83 @@ import socket from "./socket";
 import { useNavigate } from "react-router-dom";
 
 function PendingOrders() {
-  const [pending, setPending] = useState([]);
-  const navigate = useNavigate();
+    const [pending, setPending] = useState([]);
+    const navigate = useNavigate();
 
-  const fetchPending = async () => {
-    try {
-      const res = await api.get("/api/catalog");
-      const data = res.data;
-      setPending(
-        Array.isArray(data)
-          ? data.filter(
-              (item) => item.status && item.status.startsWith("Ordered by")
-            )
-          : []
-      );
-    } catch (err) {
-      setPending([]);
-    }
-  };
+    const fetchPending = async () => {
+        try {
+            const res = await api.get("/api/catalog");
+            const data = res.data;
+            setPending(
+                Array.isArray(data)
+                    ? data.filter(
+                        (item) => item.status && item.status.startsWith("Ordered by")
+                    )
+                    : []
+            );
+        } catch (err) {
+            setPending([]);
+        }
+    };
 
-  useEffect(() => {
-    fetchPending();
-    socket.on("itemOrdered", fetchPending);
-    return () => socket.off("itemOrdered", fetchPending);
-  }, []);
+    useEffect(() => {
+        fetchPending();
+        socket.on("itemOrdered", fetchPending);
+        return () => socket.off("itemOrdered", fetchPending);
+    }, []);
 
-  const handleReceived = async (item) => {
-    const now = new Date().toISOString();
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
-    });
-    if (res.ok) {
-      fetchPending();
-    }
-  };
+    const handleReceived = async (item) => {
+        const now = new Date().toISOString();
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/catalog/${item.id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ severity: "Good", delivered_on: now, status: "Needs Ordered" })
+        });
+        if (res.ok) {
+            fetchPending();
+        }
+    };
 
-  return (
-    <div className="pending-orders">
-      <h1>Pending Orders</h1>
-      {pending.length === 0 ? (
-        <p>No pending orders.</p>
-      ) : (
-        <div className="pending-list">
-          {pending.map((item) => (
-            <div key={item.id} className="pending-card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                onClick={() => navigate(`/catalog/${item.id}`)}
-                style={{
-                  background: '#f5f5f5',
-                  border: '1px solid #bbb',
-                  borderRadius: 6,
-                  padding: '0.5rem 1.2rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  flex: 1,
-                  textAlign: 'left',
-                  minWidth: 0
-                }}
-                title="View item details"
-              >
-                <strong>{item.name}</strong>
-                <div style={{ fontWeight: 400, fontSize: 13, color: '#444' }}>{item.status}</div>
-              </button>
-              <button onClick={() => handleReceived(item)} style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}>
-                Received
-              </button>
-            </div>
-          ))}
+    return (
+        <div className="pending-orders">
+            <h1>Pending Orders</h1>
+            {pending.length === 0 ? (
+                <p>No pending orders.</p>
+            ) : (
+                <div className="pending-list">
+                    {pending.map((item) => (
+                        <div key={item.id} className="pending-card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <button
+                                onClick={() => navigate(`/catalog/${item.id}`)}
+                                style={{
+                                    background: '#f5f5f5',
+                                    border: '1px solid #bbb',
+                                    borderRadius: 6,
+                                    padding: '0.5rem 1.2rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    flex: 1,
+                                    textAlign: 'left',
+                                    minWidth: 0
+                                }}
+                                title="View item details"
+                            >
+                                <strong>{item.name}</strong>
+                                <div style={{ fontWeight: 400, fontSize: 13, color: '#444' }}>{item.status}</div>
+                            </button>
+                            <button onClick={() => handleReceived(item)} style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}>
+                                Received
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 }
 
 export default PendingOrders;
