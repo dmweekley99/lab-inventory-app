@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import OrderedButton from "./OrderedButton";
 import DownloadCSVButton from "./DownloadCSVButton";
 import api from "./api";
+import socket from "./socket";
 import "./App.css";
 
 function NeedsOrdered() {
@@ -31,11 +32,29 @@ function NeedsOrdered() {
     };
     useEffect(() => {
         fetchItems();
-        const handler = () => fetchItems();
-        window.addEventListener('catalog-updated', handler);
-        return () => {
-            window.removeEventListener('catalog-updated', handler);
+        // Real-time update: update needs-ordered list on any itemOrdered event
+        const handleItemOrdered = (updated) => {
+            setItems((prev) => {
+                // Should this item be in the Needs Ordered list?
+                const isNeeded =
+                    (updated.status === "Needs Ordered" || !updated.status) &&
+                    (updated.severity === "Low" || updated.severity === "Very Low" || updated.severity === "Critical");
+                const exists = prev.some((i) => i.id === updated.id);
+                if (isNeeded) {
+                    // Add or update
+                    if (exists) {
+                        return prev.map((i) => (i.id === updated.id ? updated : i));
+                    } else {
+                        return [...prev, updated];
+                    }
+                } else {
+                    // Remove if present
+                    return prev.filter((i) => i.id !== updated.id);
+                }
+            });
         };
+        socket.on("itemOrdered", handleItemOrdered);
+        return () => socket.off("itemOrdered", handleItemOrdered);
     }, []);
 
     const filteredItems = items.filter((item) => {

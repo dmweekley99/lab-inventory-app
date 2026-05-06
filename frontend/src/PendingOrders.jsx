@@ -25,8 +25,26 @@ function PendingOrders() {
 
     useEffect(() => {
         fetchPending();
-        socket.on("itemOrdered", fetchPending);
-        return () => socket.off("itemOrdered", fetchPending);
+        // Real-time update: update pending list on any itemOrdered event
+        const handleItemOrdered = (updated) => {
+            setPending((prev) => {
+                // If the item is now ordered, add or update it in the list
+                if (updated && updated.status && updated.status.startsWith("Ordered by")) {
+                    // If already present, update; else add
+                    const exists = prev.some((i) => i.id === updated.id);
+                    if (exists) {
+                        return prev.map((i) => (i.id === updated.id ? updated : i));
+                    } else {
+                        return [...prev, updated];
+                    }
+                } else {
+                    // If the item is no longer ordered, remove it
+                    return prev.filter((i) => i.id !== updated.id);
+                }
+            });
+        };
+        socket.on("itemOrdered", handleItemOrdered);
+        return () => socket.off("itemOrdered", handleItemOrdered);
     }, []);
 
     const handleReceived = async (item) => {
