@@ -24,6 +24,7 @@ CREATE TABLE material_catalog (
   purchase_url TEXT,
   notes TEXT,
   ordered_by TEXT,
+  received_by TEXT,
   status TEXT DEFAULT 'Needs Ordered',
   group_id INTEGER REFERENCES groups(id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

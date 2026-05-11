@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "./api";
+import socket from "./socket";
 
 function InventoryCatalog() {
     const location = useLocation();
@@ -65,6 +66,15 @@ function InventoryCatalog() {
         if (Object.keys(prefill).length > 0) {
             setForm((f) => ({ ...f, ...prefill }));
         }
+
+        // Listen for real-time updates
+        socket.on("itemOrdered", (item) => {
+            // Optionally: only refetch if item is in current filter
+            fetchCatalog();
+        });
+        return () => {
+            socket.off("itemOrdered");
+        };
     }, [location.search]);
 
     const handleChange = (e) => {

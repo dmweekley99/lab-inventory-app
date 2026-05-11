@@ -12,6 +12,12 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// --- SOCKET.IO ---
+const http = require('http');
+const server = http.createServer(app);
+const { initSocket, emitItemOrdered } = require('./socket');
+initSocket(server);
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -133,6 +139,8 @@ app.patch("/api/catalog/:id/status", requireAuth, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Catalog item not found" });
     }
+    // Emit real-time update to all clients
+    emitItemOrdered(result.rows[0]);
     res.json(result.rows[0]);
   } catch (err) {
     console.error("PATCH /api/catalog/:id/status error:", err);
@@ -190,7 +198,8 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
     if (fields.severity === "Good") {
       fields.notes = "";
     }
-    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status", "ordered_on", "delivered_on", "ordered_by", "notes"];
+    console.log("PATCH /api/catalog/:id body:", fields);
+    const allowed = ["name", "catalog_number", "severity", "default_location", "preferred_vendor", "purchase_url", "status", "ordered_on", "delivered_on", "ordered_by", "received_by", "notes"];
     const updates = [];
     const values = [];
     let idx = 1;
@@ -214,6 +223,7 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Catalog item not found" });
     }
+    console.log("PATCH /api/catalog/:id updated row:", result.rows[0]);
     res.json(result.rows[0]);
   } catch (err) {
     console.error("PATCH /api/catalog/:id error:", err);
@@ -221,5 +231,4 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
-// --- SERVER START ---
 app.listen(process.env.PORT || 5050);

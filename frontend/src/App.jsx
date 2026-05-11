@@ -2,6 +2,7 @@ import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import InventoryCatalog from "./InventoryCatalog";
 import ItemDetail from "./ItemDetail";
 import NeedsOrdered from "./NeedsOrdered";
+import PendingOrders from "./PendingOrders";
 import LoginForm from "./LoginForm";
 import { useAuth } from "./AuthContext";
 import "./App.css";
@@ -46,7 +47,8 @@ function App() {
       <nav style={{ marginBottom: "1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
         <Link to="/">Home</Link> | {" "}
         <Link to="/catalog">Inventory Catalog</Link> | {" "}
-        <Link to="/needs-ordered">Needs Ordered</Link>
+        <Link to="/needs-ordered">Needs Ordered</Link> | {" "}
+        <Link to="/pending-orders">Pending Orders</Link>
       </nav>
       <Routes>
         <Route
@@ -64,6 +66,7 @@ function App() {
         />
         <Route path="/catalog" element={<InventoryCatalog />} />
         <Route path="/needs-ordered" element={<NeedsOrdered />} />
+        <Route path="/pending-orders" element={<PendingOrders />} />
         <Route path="/catalog/:id" element={<ItemDetail type="catalog" />} />
       </Routes>
     </div>
