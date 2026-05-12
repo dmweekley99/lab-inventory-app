@@ -1,18 +1,27 @@
 {
-  "manifest_version": 3,
-  "name": "Jupiter Catalog",
-  "version": "1.0.0",
-  "description": "Manage catalog items",
-  "permissions": [
-    "storage"
-  ],
-  "host_permissions": [
-    "http://localhost:5050/*"
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "jupiter.svg"
+    "manifest_version": 3,
+    "name": "Jupiter Catalog",
+    "version": "1.0.0",
+    "description": "Manage catalog items",
+    "permissions": [
+        "storage"
+    ],
+    "host_permissions": [
+        "http://localhost:5050/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "./assets/jupiter.svg",
+            "32": "./assets/jupiter.svg",
+            "48": "./assets/jupiter.svg",
+            "128": "./assets/jupiter.svg"
+        }
+    },
+    "icons": {
+        "16": "./assets/jupiter.svg",
+        "32": "./assets/jupiter.svg",
+        "48": "./assets/jupiter.svg",
+        "128": "./assets/jupiter.svg"
     }
-  }
 }

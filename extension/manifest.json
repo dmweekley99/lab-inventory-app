@@ -7,12 +7,21 @@
         "storage"
     ],
     "host_permissions": [
-        "http://localhost:3001/*"
+        "http://localhost:5050/*"
     ],
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "16": "jupiter.svg"
+            "16": "./assets/jupiter.svg",
+            "32": "./assets/jupiter.svg",
+            "48": "./assets/jupiter.svg",
+            "128": "./assets/jupiter.svg"
         }
+    },
+    "icons": {
+        "16": "./assets/jupiter.svg",
+        "32": "./assets/jupiter.svg",
+        "48": "./assets/jupiter.svg",
+        "128": "./assets/jupiter.svg"
     }
 }
