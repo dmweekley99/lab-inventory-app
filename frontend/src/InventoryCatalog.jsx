@@ -263,28 +263,6 @@ function InventoryCatalog() {
                                 Location: {item.location || item.default_location || "N/A"}
                             </div>
                         </Link>
-                        {item.purchase_url && (
-                            <div className="card-url url-text">
-                                <a
-                                    href={item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {(() => {
-                                        const url = item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`;
-                                        try {
-                                            const { hostname } = new URL(url);
-                                            return hostname;
-                                        } catch {
-                                            // fallback: show up to first slash or full string
-                                            const noProto = url.replace(/^https?:\/\//, "");
-                                            const idx = noProto.indexOf("/");
-                                            return idx !== -1 ? noProto.slice(0, idx) : noProto;
-                                        }
-                                    })()}
-                                </a>
-                            </div>
-                        )}
                         <div className="card-severity">
                             <label htmlFor={`severity-select-${item.id}`}>Severity: </label>
                             <select
