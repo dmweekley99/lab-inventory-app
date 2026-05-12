@@ -581,9 +581,11 @@ button:hover {
   display: inline-block;
   margin-right: 0.5rem;
 }
+
 .top-nav-btn:last-child {
   margin-right: 0;
 }
+
 .top-nav-btn:hover {
   background: #ffd580;
   color: #b00020 !important;
