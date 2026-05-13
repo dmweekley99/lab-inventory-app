@@ -231,4 +231,127 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
+// --- ORDERS ROUTES ---
+// Create a new order
+app.post("/api/orders", requireAuth, async (req, res) => {
+  try {
+    const group_id = req.user.group_id;
+    const { material_id, price_paid, ordered_by, received_by, ordered_on, delivered_on } = req.body;
+    const result = await pool.query(
+      `INSERT INTO orders (material_id, group_id, price_paid, ordered_by, received_by, ordered_on, delivered_on)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [material_id, group_id, price_paid, ordered_by, received_by, ordered_on, delivered_on]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("POST /api/orders error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Filter orders
+app.get("/api/orders", requireAuth, async (req, res) => {
+  try {
+    const group_id = req.user.group_id;
+    const { ordered_by, received_by, ordered_on, delivered_on, name } = req.query;
+    let query = `SELECT o.*, m.name FROM orders o JOIN material_catalog m ON o.material_id = m.id WHERE o.group_id = $1`;
+    const params = [group_id];
+    if (ordered_by) { query += ` AND o.ordered_by ILIKE $${params.length + 1}`; params.push(`%${ordered_by}%`); }
+    if (received_by) { query += ` AND o.received_by ILIKE $${params.length + 1}`; params.push(`%${received_by}%`); }
+    if (ordered_on) { query += ` AND DATE(o.ordered_on) = $${params.length + 1}`; params.push(ordered_on); }
+    if (delivered_on) { query += ` AND DATE(o.delivered_on) = $${params.length + 1}`; params.push(delivered_on); }
+    if (name) { query += ` AND m.name ILIKE $${params.length + 1}`; params.push(`%${name}%`); }
+    query += ` ORDER BY o.ordered_on DESC NULLS LAST`;
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("GET /api/orders error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Export orders to CSV
+app.get("/api/orders/export", requireAuth, async (req, res) => {
+  try {
+    const group_id = req.user.group_id;
+    const { ordered_by, received_by, ordered_on, delivered_on, name } = req.query;
+    let query = `SELECT o.*, m.name FROM orders o JOIN material_catalog m ON o.material_id = m.id WHERE o.group_id = $1`;
+    const params = [group_id];
+    if (ordered_by) { query += ` AND o.ordered_by ILIKE $${params.length + 1}`; params.push(`%${ordered_by}%`); }
+    if (received_by) { query += ` AND o.received_by ILIKE $${params.length + 1}`; params.push(`%${received_by}%`); }
+    if (ordered_on) { query += ` AND DATE(o.ordered_on) = $${params.length + 1}`; params.push(ordered_on); }
+    if (delivered_on) { query += ` AND DATE(o.delivered_on) = $${params.length + 1}`; params.push(delivered_on); }
+    if (name) { query += ` AND m.name ILIKE $${params.length + 1}`; params.push(`%${name}%`); }
+    query += ` ORDER BY o.ordered_on DESC NULLS LAST`;
+    const result = await pool.query(query, params);
+    // Convert to CSV
+    const fields = result.fields.map(f => f.name);
+    const csvRows = [fields.join(",")].concat(result.rows.map(row => fields.map(f => row[f]).join(",")));
+    res.header("Content-Type", "text/csv");
+    res.attachment("orders.csv");
+    res.send(csvRows.join("\n"));
+  } catch (err) {
+    console.error("GET /api/orders/export error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- GROUP REGISTRATION ---
+// Table: pending_groups (id SERIAL, name TEXT UNIQUE, approved BOOLEAN DEFAULT FALSE)
+app.post("/api/groups/register", async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: "Group name required" });
+  try {
+    // Insert as pending approval
+    await pool.query(
+      "INSERT INTO pending_groups (name, approved) VALUES ($1, FALSE)",
+      [name]
+    );
+    res.status(201).json({ message: "Group registration request submitted for approval." });
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ error: "Group name already requested or exists." });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin endpoint to approve group
+app.post("/api/groups/approve", async (req, res) => {
+  // You should protect this route (e.g., check req.user.email === 'your@email.com')
+  const { name } = req.body;
+  try {
+    // Move from pending_groups to groups
+    const pending = await pool.query("SELECT * FROM pending_groups WHERE name = $1 AND approved = FALSE", [name]);
+    if (pending.rows.length === 0) return res.status(404).json({ error: "No such pending group" });
+    // Insert into groups
+    await pool.query("INSERT INTO groups (name) VALUES ($1)", [name]);
+    await pool.query("UPDATE pending_groups SET approved = TRUE WHERE name = $1", [name]);
+    res.json({ message: "Group approved and created." });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint to list approved groups for dropdown
+app.get("/api/groups/approved", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM groups ORDER BY name ASC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List pending groups (admin only)
+app.get("/api/groups/pending", requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+  try {
+    const result = await pool.query("SELECT * FROM pending_groups WHERE approved = FALSE ORDER BY created_at ASC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(process.env.PORT || 5050);

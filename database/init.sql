@@ -1,3 +1,10 @@
+-- Pending groups table for approval workflow
+CREATE TABLE IF NOT EXISTS pending_groups (
+  id SERIAL PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  approved BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 -- Groups table for multi-tenancy
 CREATE TABLE IF NOT EXISTS groups (
   id SERIAL PRIMARY KEY,
@@ -36,12 +43,9 @@ CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,
   material_id INTEGER NOT NULL REFERENCES material_catalog(id),
   group_id INTEGER REFERENCES groups(id),
-  price_paid NUMERIC(10,2)
-);
-
-CREATE TABLE IF NOT EXISTS orders (
-  id SERIAL PRIMARY KEY,
-  material_id INTEGER NOT NULL REFERENCES material_catalog(id),
-  group_id INTEGER REFERENCES groups(id),
-  price_paid NUMERIC(10,2)
+  price_paid NUMERIC(10,2),
+  ordered_by TEXT,
+  received_by TEXT,
+  ordered_on TIMESTAMPTZ DEFAULT NULL,
+  delivered_on TIMESTAMPTZ DEFAULT NULL
 );

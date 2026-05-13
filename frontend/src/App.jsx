@@ -3,7 +3,11 @@ import InventoryCatalog from "./InventoryCatalog";
 import ItemDetail from "./ItemDetail";
 import NeedsOrdered from "./NeedsOrdered";
 import PendingOrders from "./PendingOrders";
+import OrdersPage from "./OrdersPage";
 import LoginForm from "./LoginForm";
+import GroupRegisterPage from "./GroupRegisterPage";
+import RegisterForm from "./RegisterForm";
+import AdminGroupApprovalPage from "./AdminGroupApprovalPage";
 import { useAuth } from "./AuthContext";
 import "./App.css";
 
@@ -31,18 +35,63 @@ function App() {
   );
 
   if (!isAuthenticated) {
-    // Always show login form if not authenticated, block all other routes
+    // Always show login/register/group-register if not authenticated
     return (
       <div className="login-outer-container">
-        <div className="login-bg-box">
-          <LoginForm onLogin={() => navigate("/")} />
+        <div className="login-bg-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <nav style={{ marginBottom: 24, display: "flex", gap: 16, justifyContent: "center", alignItems: "center", width: "100%" }}>
+            {navButton("/", "Login")}
+            {navButton("/register", "Register")}
+            {navButton("/group-register", "Register Group")}
+          </nav>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Routes>
+              <Route path="/register" element={<RegisterForm onRegister={() => navigate("/")} />} />
+              <Route path="/group-register" element={<GroupRegisterPage />} />
+              <Route path="*" element={<LoginForm onLogin={() => navigate("/")} />} />
+            </Routes>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Helper to check admin role from JWT
+  const isAdmin = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return false;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.role === "admin";
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="app-container" style={{ position: "relative" }}>
+      {/* Admin-only button in top right */}
+      {isAuthenticated && isAdmin() && (
+        <Link
+          to="/admin/group-approval"
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 120,
+            zIndex: 1000,
+            background: "#1976d2",
+            color: "white",
+            padding: "8px 16px",
+            borderRadius: 4,
+            textDecoration: "none",
+            fontWeight: 600,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            transition: "background 0.2s"
+          }}
+        >
+          Admin Group Approval
+        </Link>
+      )}
       <button
         onClick={logout}
         style={{
@@ -68,9 +117,14 @@ function App() {
           {navButton("/catalog", "Inventory Catalog")}
           {navButton("/needs-ordered", "Needs Ordered")}
           {navButton("/pending-orders", "Pending Orders")}
+          {navButton("/orders", "Orders")}
         </nav>
       )}
       <Routes>
+        {/* Only allow access to admin group approval page if user is admin */}
+        {isAuthenticated && JSON.parse(atob(localStorage.getItem("token").split(".")[1])).role === "admin" && (
+          <Route path="/admin/group-approval" element={<AdminGroupApprovalPage />} />
+        )}
         <Route
           path="/"
           element={
@@ -82,6 +136,7 @@ function App() {
                 {navButton("/catalog", "Inventory Catalog")}
                 {navButton("/needs-ordered", "Needs Ordered")}
                 {navButton("/pending-orders", "Pending Orders")}
+                {navButton("/orders", "Orders")}
               </nav>
             </div>
           }
@@ -89,6 +144,7 @@ function App() {
         <Route path="/catalog" element={<InventoryCatalog />} />
         <Route path="/needs-ordered" element={<NeedsOrdered />} />
         <Route path="/pending-orders" element={<PendingOrders />} />
+        <Route path="/orders" element={<OrdersPage />} />
         <Route path="/catalog/:id" element={<ItemDetail type="catalog" />} />
       </Routes>
     </div>
