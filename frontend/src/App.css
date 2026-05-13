@@ -545,7 +545,7 @@ button:hover {
 /* Home navigation buttons */
 .home-nav-btn {
   background: #ffb347;
-  color: #232526;
+  color: #232526 !important;
   border: none;
   border-radius: 10px;
   padding: 1.2rem 2.5rem;
@@ -553,10 +553,64 @@ button:hover {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, transform 0.12s;
+  text-decoration: none !important;
+  display: inline-block;
 }
 
 .home-nav-btn:hover {
   background: #ffd580;
-  color: #000;
+  color: #b00020 !important;
+  transform: translateY(-2px) scale(1.04);
+  text-decoration: none !important;
+}
+
+/* Style top nav links as yellow buttons */
+.top-nav-btn {
+  background: #ffb347;
+  color: #232526 !important;
+  border: none;
+  border-radius: 8px;
+  padding: 1.1rem 2.2rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  transition: background 0.2s, color 0.2s, transform 0.12s;
+  text-decoration: none !important;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.top-nav-btn:last-child {
+  margin-right: 0;
+}
+
+.top-nav-btn:hover {
+  background: #ffd580;
+  color: #b00020 !important;
+  transform: translateY(-2px) scale(1.04);
+  text-decoration: none !important;
+}
+
+/* Force all headings to be white */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #fff !important;
+}
+
+/* Red-orange color for URLs */
+.url-text a,
+a.url-link {
+  color: #ff9100;
+  text-decoration: underline;
+}
+
+.url-text a:hover,
+a.url-link:hover {
+  color: #ff9100;
 }

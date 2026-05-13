@@ -248,14 +248,26 @@ function InventoryCatalog() {
                                 cursor: 'pointer',
                                 fontSize: 20,
                                 color: '#d32f2f',
+                                padding: 0,
                                 zIndex: 2
                             }}
                             onClick={() => handleDelete(item)}
                         >
                             <span role="img" aria-label="delete">🗑️</span>
                         </button>
+                        <div style={{ width: '100%', marginBottom: 8 }}>
+                            <div className="card-title" style={{
+                                margin: 0,
+                                textAlign: 'center',
+                                overflowWrap: 'break-word',
+                                wordBreak: 'break-word',
+                                whiteSpace: 'normal',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '100%'
+                            }}>{item.name}</div>
+                        </div>
                         <Link to={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                            <div className="card-title">{item.name}</div>
                             <div className="card-severity">
                                 Severity: {item.severity || "N/A"}
                             </div>
@@ -263,28 +275,6 @@ function InventoryCatalog() {
                                 Location: {item.location || item.default_location || "N/A"}
                             </div>
                         </Link>
-                        {item.purchase_url && (
-                            <div className="card-url url-text">
-                                <a
-                                    href={item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {(() => {
-                                        const url = item.purchase_url.startsWith('http') ? item.purchase_url : `https://${item.purchase_url}`;
-                                        try {
-                                            const { hostname } = new URL(url);
-                                            return hostname;
-                                        } catch {
-                                            // fallback: show up to first slash or full string
-                                            const noProto = url.replace(/^https?:\/\//, "");
-                                            const idx = noProto.indexOf("/");
-                                            return idx !== -1 ? noProto.slice(0, idx) : noProto;
-                                        }
-                                    })()}
-                                </a>
-                            </div>
-                        )}
                         <div className="card-severity">
                             <label htmlFor={`severity-select-${item.id}`}>Severity: </label>
                             <select

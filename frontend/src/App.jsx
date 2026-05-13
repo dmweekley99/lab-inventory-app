@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import InventoryCatalog from "./InventoryCatalog";
 import ItemDetail from "./ItemDetail";
 import NeedsOrdered from "./NeedsOrdered";
@@ -7,11 +7,28 @@ import LoginForm from "./LoginForm";
 import { useAuth } from "./AuthContext";
 import "./App.css";
 
-
-
 function App() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
+
+  // Helper for nav button
+  const navButton = (to, label) => (
+    <Link
+      className="top-nav-btn"
+      to={to}
+      style={{
+        pointerEvents: location.pathname === to ? "none" : "auto",
+        background: location.pathname === to ? "#aaa" : "#ffbe57",
+        color: location.pathname === to ? "#222" : "#222",
+        cursor: location.pathname === to ? "default" : "pointer",
+      }}
+      aria-current={location.pathname === to ? "page" : undefined}
+      tabIndex={location.pathname === to ? -1 : 0}
+    >
+      {label}
+    </Link>
+  );
 
   if (!isAuthenticated) {
     // Always show login form if not authenticated, block all other routes
@@ -38,18 +55,21 @@ function App() {
           border: "1px solid #ccc",
           background: "#fff",
           cursor: "pointer",
-          zIndex: 10
+          zIndex: 10,
         }}
         aria-label="Log Out"
       >
         Log Out
       </button>
-      <nav style={{ marginBottom: "1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-        <Link to="/">Home</Link> | {" "}
-        <Link to="/catalog">Inventory Catalog</Link> | {" "}
-        <Link to="/needs-ordered">Needs Ordered</Link> | {" "}
-        <Link to="/pending-orders">Pending Orders</Link>
-      </nav>
+      {/* Only show nav bar at the top for non-home pages */}
+      {location.pathname !== "/" && (
+        <nav style={{ display: "flex", alignItems: "center", gap: "2rem", justifyContent: "center", margin: "2.5rem auto 0 auto" }}>
+          {navButton("/", "Home")}
+          {navButton("/catalog", "Inventory Catalog")}
+          {navButton("/needs-ordered", "Needs Ordered")}
+          {navButton("/pending-orders", "Pending Orders")}
+        </nav>
+      )}
       <Routes>
         <Route
           path="/"
@@ -57,10 +77,12 @@ function App() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "4rem" }}>
               <h1>Jupiter App </h1>
               <h1>Inventory System</h1>
-              <div className="home-nav-btn-container" style={{ display: "flex", gap: "2rem", marginTop: "2.5rem", width: "100%", maxWidth: 400 }}>
-                <button className="home-nav-btn" onClick={() => navigate("/catalog")}>Inventory Catalog</button>
-                <button className="home-nav-btn" onClick={() => navigate("/needs-ordered")}>Needs Ordered</button>
-              </div>
+              <nav style={{ display: "flex", alignItems: "center", gap: "2rem", justifyContent: "center", margin: "2.5rem auto 0 auto" }}>
+                {navButton("/", "Home")}
+                {navButton("/catalog", "Inventory Catalog")}
+                {navButton("/needs-ordered", "Needs Ordered")}
+                {navButton("/pending-orders", "Pending Orders")}
+              </nav>
             </div>
           }
         />

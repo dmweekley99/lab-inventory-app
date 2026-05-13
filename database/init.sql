@@ -28,8 +28,15 @@ CREATE TABLE material_catalog (
   status TEXT DEFAULT 'Needs Ordered',
   group_id INTEGER REFERENCES groups(id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  ordered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-  delivered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+  ordered_on TIMESTAMPTZ DEFAULT NULL,
+  delivered_on TIMESTAMPTZ DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  id SERIAL PRIMARY KEY,
+  material_id INTEGER NOT NULL REFERENCES material_catalog(id),
+  group_id INTEGER REFERENCES groups(id),
+  price_paid NUMERIC(10,2)
 );
 
 CREATE TABLE IF NOT EXISTS orders (
