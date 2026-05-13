@@ -604,11 +604,13 @@ h6 {
 }
 
 /* Red-orange color for URLs */
-.url-text a, a.url-link {
+.url-text a,
+a.url-link {
   color: #ff9100;
   text-decoration: underline;
 }
 
-.url-text a:hover, a.url-link:hover {
+.url-text a:hover,
+a.url-link:hover {
   color: #ff9100;
 }
