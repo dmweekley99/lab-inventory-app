@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "./api";
 import socket from "./socket";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function PendingOrders() {
     const [pending, setPending] = useState([]);
@@ -68,7 +68,7 @@ function PendingOrders() {
 
     return (
         <>
-            {/* Mobile menu button (not on home page) */}
+            {/* Mobile menu button and nav, only for mobile (hidden on desktop via CSS) */}
             <button
                 className="mobile-menu-btn"
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -105,10 +105,10 @@ function PendingOrders() {
                     gap: 32,
                 }}
             >
-                <a className="home-nav-btn" href="/" onClick={() => setMenuOpen(false)}>Home</a>
-                <a className="home-nav-btn" href="/catalog" onClick={() => setMenuOpen(false)}>Inventory Catalog</a>
-                <a className="home-nav-btn" href="/needs-ordered" onClick={() => setMenuOpen(false)}>Needs Ordered</a>
-                <a className="home-nav-btn" href="/pending-orders" onClick={() => setMenuOpen(false)}>Pending Orders</a>
+                <Link className="home-nav-btn" to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+                <Link className="home-nav-btn" to="/catalog" onClick={() => setMenuOpen(false)}>Inventory Catalog</Link>
+                <Link className="home-nav-btn" to="/needs-ordered" onClick={() => setMenuOpen(false)}>Needs Ordered</Link>
+                <Link className="home-nav-btn" to="/pending-orders" onClick={() => setMenuOpen(false)}>Pending Orders</Link>
             </nav>
             <div className="pending-orders">
                 <h1>Pending Orders</h1>

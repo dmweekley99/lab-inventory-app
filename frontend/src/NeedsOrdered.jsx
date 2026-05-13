@@ -68,7 +68,7 @@ function NeedsOrdered() {
 
     return (
         <>
-            {/* Mobile menu button (not on home page) */}
+            {/* Mobile menu button and nav, only for mobile (hidden on desktop via CSS) */}
             <button
                 className="mobile-menu-btn"
                 aria-label={menuOpen ? "Close menu" : "Open menu"}

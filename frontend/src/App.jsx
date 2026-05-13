@@ -1,10 +1,12 @@
 import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
+
 import InventoryCatalog from "./InventoryCatalog";
 import ItemDetail from "./ItemDetail";
 import NeedsOrdered from "./NeedsOrdered";
 import PendingOrders from "./PendingOrders";
 import LoginForm from "./LoginForm";
 import { useAuth } from "./AuthContext";
+import DesktopNavBar from "./DesktopNavBar";
 import "./App.css";
 
 function App() {
@@ -61,7 +63,12 @@ function App() {
       >
         Log Out
       </button>
-      {/* No nav bar outside of <Routes> */}
+      {/* Desktop nav bar on all pages except home */}
+      {location.pathname !== "/" && (
+        <div className="desktop-nav-bar-container">
+          <DesktopNavBar />
+        </div>
+      )}
       <Routes>
         <Route
           path="/"
