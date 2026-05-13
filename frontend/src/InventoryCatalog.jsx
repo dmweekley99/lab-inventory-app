@@ -16,7 +16,7 @@ function InventoryCatalog() {
         preferred_vendor: "",
         purchase_url: "",
         notes: "",
-    });
+                          });
     // Remove separate filter states, use form state for filtering
 
 
@@ -213,76 +213,76 @@ function InventoryCatalog() {
                 </>
             )}
             <div className="inventory-catalog">
-                <h1 className="main-title">Inventory Catalog</h1>
+            <h1 className="main-title">Inventory Catalog</h1>
 
-                <form onSubmit={handleSubmit} className="inventory-form">
-                    <input
-                        id="catalog-name"
-                        name="name"
-                        autoComplete="off"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="Item Name"
-                        required
-                    />
-                    <input
-                        id="catalog-number"
-                        name="catalog_number"
-                        autoComplete="off"
-                        value={form.catalog_number}
-                        onChange={handleChange}
-                        placeholder="Catalog Number"
-                    />
-                    <select
-                        id="catalog-severity"
-                        name="severity"
-                        autoComplete="off"
-                        value={form.severity}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="">Select Severity</option>
-                        <option value="Good">Good</option>
-                        <option value="Low">Low</option>
-                        <option value="Very Low">Very Low</option>
-                        <option value="Critical">Critical</option>
-                    </select>
-                    <input
-                        id="catalog-default-location"
-                        name="default_location"
-                        autoComplete="off"
-                        value={form.default_location}
-                        onChange={handleChange}
-                        placeholder="Location"
-                        required
-                    />
-                    <input
-                        id="catalog-preferred-vendor"
-                        name="preferred_vendor"
-                        autoComplete="off"
-                        value={form.preferred_vendor}
-                        onChange={handleChange}
-                        placeholder="Preferred Vendor (filters list)"
-                    />
-                    <input
-                        id="catalog-purchase-url"
-                        name="purchase_url"
-                        autoComplete="off"
-                        value={form.purchase_url}
-                        onChange={handleChange}
-                        placeholder="Purchase URL"
-                    />
-                    <input
-                        id="catalog-notes"
-                        name="notes"
-                        autoComplete="off"
-                        value={form.notes}
-                        onChange={handleChange}
-                        placeholder="Notes"
-                    />
-                    <button type="submit">Add Item</button>
-                </form>
-            </div><h3>All Items</h3><div className="inventory-catalog-cards">
+            <form onSubmit={handleSubmit} className="inventory-form">
+                <input
+                    id="catalog-name"
+                    name="name"
+                    autoComplete="off"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Item Name"
+                    required
+                />
+                <input
+                    id="catalog-number"
+                    name="catalog_number"
+                    autoComplete="off"
+                    value={form.catalog_number}
+                    onChange={handleChange}
+                    placeholder="Catalog Number"
+                />
+                <select
+                    id="catalog-severity"
+                    name="severity"
+                    autoComplete="off"
+                    value={form.severity}
+                    onChange={handleChange}
+                    required
+                >
+                    <option value="">Select Severity</option>
+                    <option value="Good">Good</option>
+                    <option value="Low">Low</option>
+                    <option value="Very Low">Very Low</option>
+                    <option value="Critical">Critical</option>
+                </select>
+                <input
+                    id="catalog-default-location"
+                    name="default_location"
+                    autoComplete="off"
+                    value={form.default_location}
+                    onChange={handleChange}
+                    placeholder="Location"
+                    required
+                />
+                <input
+                    id="catalog-preferred-vendor"
+                    name="preferred_vendor"
+                    autoComplete="off"
+                    value={form.preferred_vendor}
+                    onChange={handleChange}
+                    placeholder="Preferred Vendor"
+                />
+                <input
+                    id="catalog-purchase-url"
+                    name="purchase_url"
+                    autoComplete="off"
+                    value={form.purchase_url}
+                    onChange={handleChange}
+                    placeholder="Purchase URL"
+                />
+                <input
+                    id="catalog-notes"
+                    name="notes"
+                    autoComplete="off"
+                    value={form.notes}
+                    onChange={handleChange}
+                    placeholder="Notes"
+                />
+                <button type="submit">Add Item</button>
+            </form>
+        </div><h3>All Items</h3><div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
                     <div className="inventory-card" key={item.id} style={{ position: 'relative' }}>
                         <button
