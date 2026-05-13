@@ -31,7 +31,7 @@ function OrderedButton({ item, onOrdered }) {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
             <button onClick={handleOrdered} disabled={ordering} style={{ background: '#1976d2', color: '#fff' }}>
-                {ordering ? "Ordering..." : "Ordered"}
+                {ordering ? "Ordering..." : "Order Item"}
             </button>
         </div>
     );

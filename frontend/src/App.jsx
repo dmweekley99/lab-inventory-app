@@ -77,11 +77,11 @@ function App() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "4rem" }}>
               <h1>Jupiter App </h1>
               <h1>Inventory System</h1>
-              <nav style={{ display: "flex", alignItems: "center", gap: "2rem", justifyContent: "center", margin: "2.5rem auto 0 auto" }}>
-                {navButton("/", "Home")}
-                {navButton("/catalog", "Inventory Catalog")}
-                {navButton("/needs-ordered", "Needs Ordered")}
-                {navButton("/pending-orders", "Pending Orders")}
+              <nav className="home-nav-btn-container" style={{ display: "flex", alignItems: "center", gap: "2rem", justifyContent: "center", margin: "2.5rem auto 0 auto" }}>
+                <Link className="home-nav-btn" to="/">Home</Link>
+                <Link className="home-nav-btn" to="/catalog">Inventory Catalog</Link>
+                <Link className="home-nav-btn" to="/needs-ordered">Needs Ordered</Link>
+                <Link className="home-nav-btn" to="/pending-orders">Pending Orders</Link>
               </nav>
             </div>
           }

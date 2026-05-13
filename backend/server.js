@@ -223,6 +223,6 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
-server.listen(process.env.PORT || 5050, () => {
+server.listen(process.env.PORT || 5050, '0.0.0.0', () => {
   console.log('Server and Socket.IO listening on port', process.env.PORT || 5050);
 });
