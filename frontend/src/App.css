@@ -2,9 +2,11 @@
 .desktop-nav-bar-container {
   display: block;
 }
+
 .desktop-nav-bar {
   display: flex;
 }
+
 @media (max-width: 900px) {
   .desktop-nav-bar-container {
     display: none !important;
@@ -16,12 +18,15 @@
 .mobile-nav-menu {
   display: none;
 }
+
 @media (max-width: 900px) {
+
   .mobile-menu-btn,
   .mobile-nav-menu {
     display: block;
   }
 }
+
 @media (max-width: 700px) {
   .mobile-menu-btn {
     display: block !important;
