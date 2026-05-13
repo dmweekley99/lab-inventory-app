@@ -61,15 +61,7 @@ function App() {
       >
         Log Out
       </button>
-      {/* Only show nav bar at the top for non-home pages */}
-      {location.pathname !== "/" && (
-        <nav style={{ display: "flex", alignItems: "center", gap: "2rem", justifyContent: "center", margin: "2.5rem auto 0 auto" }}>
-          {navButton("/", "Home")}
-          {navButton("/catalog", "Inventory Catalog")}
-          {navButton("/needs-ordered", "Needs Ordered")}
-          {navButton("/pending-orders", "Pending Orders")}
-        </nav>
-      )}
+      {/* No nav bar outside of <Routes> */}
       <Routes>
         <Route
           path="/"

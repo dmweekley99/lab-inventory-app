@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function PendingOrders() {
     const [pending, setPending] = useState([]);
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const fetchPending = async () => {
         try {
@@ -66,40 +67,84 @@ function PendingOrders() {
     };
 
     return (
-        <div className="pending-orders">
-            <h1>Pending Orders</h1>
-            {pending.length === 0 ? (
-                <p>No pending orders.</p>
-            ) : (
-                <div className="pending-list">
-                    {pending.map((item) => (
-                        <div key={item.id} className="pending-card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <button
-                                onClick={() => navigate(`/catalog/${item.id}`)}
-                                style={{
-                                    background: '#f5f5f5',
-                                    border: '1px solid #bbb',
-                                    borderRadius: 6,
-                                    padding: '0.5rem 1.2rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    flex: 1,
-                                    textAlign: 'left',
-                                    minWidth: 0
-                                }}
-                                title="View item details"
-                            >
-                                <strong>{item.name}</strong>
-                                <div style={{ fontWeight: 400, fontSize: 13, color: '#444' }}>{item.status}</div>
-                            </button>
-                            <button onClick={() => handleReceived(item)} style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}>
-                                Received
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+        <>
+            {/* Mobile menu button (not on home page) */}
+            <button
+                className="mobile-menu-btn"
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                onClick={() => setMenuOpen((v) => !v)}
+                style={{
+                    display: 'none',
+                    position: 'fixed',
+                    top: 18,
+                    left: 18,
+                    zIndex: 2000,
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 32,
+                    color: '#fff',
+                    cursor: 'pointer',
+                }}
+            >
+                <span role="img" aria-label="menu">{menuOpen ? '✖️' : '☰'}</span>
+            </button>
+            {/* Mobile nav menu */}
+            <nav className={`mobile-nav-menu${menuOpen ? ' open' : ''}`}
+                style={{
+                    display: menuOpen ? 'flex' : 'none',
+                    flexDirection: 'column',
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: 'rgba(30,30,30,0.97)',
+                    zIndex: 1999,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 32,
+                }}
+            >
+                <a className="home-nav-btn" href="/" onClick={() => setMenuOpen(false)}>Home</a>
+                <a className="home-nav-btn" href="/catalog" onClick={() => setMenuOpen(false)}>Inventory Catalog</a>
+                <a className="home-nav-btn" href="/needs-ordered" onClick={() => setMenuOpen(false)}>Needs Ordered</a>
+                <a className="home-nav-btn" href="/pending-orders" onClick={() => setMenuOpen(false)}>Pending Orders</a>
+            </nav>
+            <div className="pending-orders">
+                <h1>Pending Orders</h1>
+                {pending.length === 0 ? (
+                    <p>No pending orders.</p>
+                ) : (
+                    <div className="pending-list">
+                        {pending.map((item) => (
+                            <div key={item.id} className="pending-card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <button
+                                    onClick={() => navigate(`/catalog/${item.id}`)}
+                                    style={{
+                                        background: '#f5f5f5',
+                                        border: '1px solid #bbb',
+                                        borderRadius: 6,
+                                        padding: '0.5rem 1.2rem',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        flex: 1,
+                                        textAlign: 'left',
+                                        minWidth: 0
+                                    }}
+                                    title="View item details"
+                                >
+                                    <strong>{item.name}</strong>
+                                    <div style={{ fontWeight: 400, fontSize: 13, color: '#444' }}>{item.status}</div>
+                                </button>
+                                <button onClick={() => handleReceived(item)} style={{ background: '#388e3c', color: '#fff', fontWeight: 500 }}>
+                                    Received
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </>
     );
 }
 

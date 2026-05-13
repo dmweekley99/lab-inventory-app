@@ -10,11 +10,21 @@
   .mobile-nav-menu.open {
     display: flex !important;
   }
+}
 
-  /* Hide desktop nav bar if present */
-  nav[style*="display: flex"]:not(.mobile-nav-menu) {
-    display: none !important;
+@media (max-width: 700px) {
+  .mobile-menu-btn {
+    display: block !important;
   }
+
+  .mobile-nav-menu {
+    display: none;
+  }
+
+  .mobile-nav-menu.open {
+    display: flex !important;
+  }
+
 }
 
 html,

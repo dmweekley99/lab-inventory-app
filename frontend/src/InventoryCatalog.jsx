@@ -166,48 +166,52 @@ function InventoryCatalog() {
 
     return (
         <>
-            {/* Mobile menu button */}
-            <button
-                className="mobile-menu-btn"
-                aria-label={menuOpen ? "Close menu" : "Open menu"}
-                onClick={() => setMenuOpen((v) => !v)}
-                style={{
-                    display: 'none',
-                    position: 'fixed',
-                    top: 18,
-                    left: 18,
-                    zIndex: 2000,
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: 32,
-                    color: '#fff',
-                    cursor: 'pointer',
-                }}
-            >
-                <span role="img" aria-label="menu">{menuOpen ? '✖️' : '☰'}</span>
-            </button>
-            {/* Mobile nav menu */}
-            <nav className={`mobile-nav-menu${menuOpen ? ' open' : ''}`}
-                style={{
-                    display: menuOpen ? 'flex' : 'none',
-                    flexDirection: 'column',
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    background: 'rgba(30,30,30,0.97)',
-                    zIndex: 1999,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 32,
-                }}
-            >
-                <Link className="home-nav-btn" to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-                <Link className="home-nav-btn" to="/catalog" onClick={() => setMenuOpen(false)}>Inventory Catalog</Link>
-                <Link className="home-nav-btn" to="/needs-ordered" onClick={() => setMenuOpen(false)}>Needs Ordered</Link>
-                <Link className="home-nav-btn" to="/pending-orders" onClick={() => setMenuOpen(false)}>Pending Orders</Link>
-            </nav>
+            {/* Only show menu button if not on home page */}
+            {location.pathname !== '/' && (
+                <>
+                    <button
+                        className="mobile-menu-btn"
+                        aria-label={menuOpen ? "Close menu" : "Open menu"}
+                        onClick={() => setMenuOpen((v) => !v)}
+                        style={{
+                            display: 'none',
+                            position: 'fixed',
+                            top: 18,
+                            left: 18,
+                            zIndex: 2000,
+                            background: 'transparent',
+                            border: 'none',
+                            fontSize: 32,
+                            color: '#fff',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        <span role="img" aria-label="menu">{menuOpen ? '✖️' : '☰'}</span>
+                    </button>
+                    {/* Mobile nav menu */}
+                    <nav className={`mobile-nav-menu${menuOpen ? ' open' : ''}`}
+                        style={{
+                            display: menuOpen ? 'flex' : 'none',
+                            flexDirection: 'column',
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            background: 'rgba(30,30,30,0.97)',
+                            zIndex: 1999,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 32,
+                        }}
+                    >
+                        <Link className="home-nav-btn" to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+                        <Link className="home-nav-btn" to="/catalog" onClick={() => setMenuOpen(false)}>Inventory Catalog</Link>
+                        <Link className="home-nav-btn" to="/needs-ordered" onClick={() => setMenuOpen(false)}>Needs Ordered</Link>
+                        <Link className="home-nav-btn" to="/pending-orders" onClick={() => setMenuOpen(false)}>Pending Orders</Link>
+                    </nav>
+                </>
+            )}
             <div className="inventory-catalog">
                 <h1 className="main-title">Inventory Catalog</h1>
 
