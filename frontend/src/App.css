@@ -15,8 +15,9 @@
     align-items: center;
     justify-content: center;
     z-index: 2100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
+
   .mobile-menu-btn {
     display: block;
     background: #111 !important;
@@ -30,10 +31,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
     transition: background 0.2s;
   }
 }
+
 /* Desktop nav bar: visible on desktop, hidden on mobile */
 .desktop-nav-bar-container {
   display: block;
