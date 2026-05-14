@@ -102,9 +102,15 @@ body {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+}
+
+/* Main app container to prevent stretching and center content */
+.app-main-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 16px;
 }
 
 .login-outer-container {

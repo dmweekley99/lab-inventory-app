@@ -69,25 +69,15 @@ function PendingOrders() {
     return (
         <>
             {/* Mobile menu button and nav, only for mobile (hidden on desktop via CSS) */}
-            <button
-                className="mobile-menu-btn"
-                aria-label={menuOpen ? "Close menu" : "Open menu"}
-                onClick={() => setMenuOpen((v) => !v)}
-                style={{
-                    display: 'none',
-                    position: 'fixed',
-                    top: 18,
-                    left: 18,
-                    zIndex: 2000,
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: 32,
-                    color: '#fff',
-                    cursor: 'pointer',
-                }}
-            >
-                <span role="img" aria-label="menu">{menuOpen ? '✖️' : '☰'}</span>
-            </button>
+            <div className="mobile-menu-bar">
+                <button
+                    className="mobile-menu-btn"
+                    aria-label={menuOpen ? "Close menu" : "Open menu"}
+                    onClick={() => setMenuOpen((v) => !v)}
+                >
+                    <span role="img" aria-label="menu">{menuOpen ? '✖️' : '☰'}</span>
+                </button>
+            </div>
             {/* Mobile nav menu */}
             <nav className={`mobile-nav-menu${menuOpen ? ' open' : ''}`}
                 style={{
