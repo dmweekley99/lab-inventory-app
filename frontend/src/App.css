@@ -1,3 +1,39 @@
+/* Orange bar for mobile menu button */
+.mobile-menu-bar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-menu-bar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 56px;
+    background: orange;
+    align-items: center;
+    justify-content: center;
+    z-index: 2100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .mobile-menu-btn {
+    display: block;
+    background: #111 !important;
+    border: none;
+    font-size: 32px;
+    color: #fff !important;
+    margin: 0;
+    cursor: pointer;
+    z-index: 2200;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    transition: background 0.2s;
+  }
+}
 /* Desktop nav bar: visible on desktop, hidden on mobile */
 .desktop-nav-bar-container {
   display: block;
