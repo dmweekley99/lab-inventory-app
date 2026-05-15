@@ -166,25 +166,35 @@ function ItemDetail({ type }) {
                         )}
                     </div>
                 )}
-                <div className="item-detail-card">
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: 40, marginBottom: 8 }}>
-                        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            {editMode ? (
-                                <div style={{ marginBottom: 0, marginRight: 8 }}>
-                                    <label><strong>Name: </strong></label>
-                                    <input name="name" value={editForm.name || ""} onChange={handleEditChange} />
-                                </div>
-                            ) : (
-                                <h2 style={{ marginBottom: 0, textAlign: 'center' }}>{item.name}</h2>
-                            )}
-                        </div>
-                        <button
-                            title="Edit"
-                            style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 22 }}
-                            onClick={() => setEditMode((m) => !m)}
-                        >
-                            <span role="img" aria-label="edit">✏️</span>
-                        </button>
+                <div className="item-detail-card" style={{ position: 'relative' }}>
+                    <button
+                        title="Edit"
+                        style={{ position: 'absolute', right: 4, top: 4, background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, zIndex: 2, padding: 0 }}
+                        onClick={() => setEditMode((m) => !m)}
+                        aria-label="Edit item"
+                    >
+                        <span role="img" aria-label="edit">✏️</span>
+                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 40, marginBottom: 8 }}>
+                        {editMode ? (
+                            <div style={{ marginBottom: 0, marginRight: 8 }}>
+                                <label><strong>Name: </strong></label>
+                                <input name="name" value={editForm.name || ""} onChange={handleEditChange} />
+                            </div>
+                        ) : (
+                            <h2
+                                style={{
+                                    marginBottom: 0,
+                                    textAlign: 'center',
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'anywhere',
+                                    whiteSpace: 'pre-line',
+                                    maxWidth: '100%',
+                                }}
+                            >
+                                {item.name}
+                            </h2>
+                        )}
                     </div>
                     {editMode ? (
                         <>

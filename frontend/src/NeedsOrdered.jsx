@@ -143,7 +143,15 @@ function NeedsOrdered() {
                                 window.location.href = `/catalog/${item.id}`;
                             }}
                         >
-                            <div className="card-title">
+                            <div
+                                className="card-title"
+                                style={{
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'anywhere',
+                                    whiteSpace: 'pre-line',
+                                    maxWidth: '100%',
+                                }}
+                            >
                                 {item.custom_material_name || item.name}
                             </div>
                             <div className="card-severity">
