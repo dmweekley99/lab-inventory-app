@@ -242,8 +242,8 @@ h1 {
   }
 }
 
-/* Stack home page navigation buttons vertically on mobile */
-@media (max-width: 400px) {
+/* Stack home page navigation buttons vertically on mobile (wider for modern phones) */
+@media (max-width: 600px) {
 
   html,
   body {
