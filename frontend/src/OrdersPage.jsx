@@ -19,6 +19,7 @@ function OrdersPage() {
             if (v) params.append(k, v);
         });
         const res = await api.get(`/api/orders?${params.toString()}`);
+        console.log("Orders API response:", res.data);
         setOrders(res.data);
         setLoading(false);
     };

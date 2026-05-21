@@ -5,18 +5,21 @@ CREATE TABLE IF NOT EXISTS pending_groups (
   approved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- Groups table for multi-tenancy
+
 CREATE TABLE IF NOT EXISTS groups (
   id SERIAL PRIMARY KEY,
   name TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_hidden BOOLEAN DEFAULT FALSE,
+  owner_user_id INTEGER REFERENCES users(id)
 );
+
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  role TEXT DEFAULT 'user',
+  role TEXT DEFAULT 'User',
   group_id INTEGER REFERENCES groups(id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

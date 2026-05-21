@@ -127,13 +127,19 @@ function InventoryCatalog() {
             }),
         });
 
+
         if (!res.ok) {
-            console.error("Failed to add catalog item");
+            const errorText = await res.text();
+            console.error("Failed to add catalog item", errorText);
+            alert("Failed to add catalog item: " + errorText);
             return;
         }
 
         const newItem = await res.json();
-        setItems([...items, newItem]);
+        console.log("POST /api/catalog response:", newItem);
+
+        // Wait for backend to confirm, then fetch the latest catalog
+        await fetchCatalog();
         setForm({
             name: "",
             catalog_number: "",
@@ -321,3 +327,4 @@ function InventoryCatalog() {
     );
 }
 export default InventoryCatalog;
+

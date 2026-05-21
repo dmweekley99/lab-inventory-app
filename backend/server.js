@@ -3,14 +3,57 @@ const cors = require("cors");
 const { Pool } = require("pg");
 require("dotenv").config();
 
+
+const ADMIN_GROUP_NAME = process.env.ADMIN_GROUP_NAME || 'Admin';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
 const app = express();
+
 
 app.use(cors());
 app.use(express.json());
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+// --- AUTO-INIT ADMIN GROUP/USER IF DB IS EMPTY ---
+// ...existing code...
+async function ensureAdminGroupAndUser() {
+  try {
+    // Check if any groups or users exist
+    const groupCount = await pool.query('SELECT COUNT(*) FROM groups');
+    const userCount = await pool.query('SELECT COUNT(*) FROM users');
+    if (parseInt(groupCount.rows[0].count) === 0 && parseInt(userCount.rows[0].count) === 0) {
+      // Create admin group (is_hidden = true)
+      const groupRes = await pool.query(
+        "INSERT INTO groups (name, is_hidden) VALUES ($1, TRUE) RETURNING id",
+        [ADMIN_GROUP_NAME]
+      );
+      const adminGroupId = groupRes.rows[0].id;
+      // Create admin user
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      const userRes = await pool.query(
+        "INSERT INTO users (email, password_hash, role, group_id) VALUES ($1, $2, 'admin', $3) RETURNING id",
+        [ADMIN_EMAIL, passwordHash, adminGroupId]
+      );
+      const adminUserId = userRes.rows[0].id;
+      // Set owner_user_id in group
+      await pool.query(
+        "UPDATE groups SET owner_user_id = $1 WHERE id = $2",
+        [adminUserId, adminGroupId]
+      );
+      console.log(`Initialized admin group (${ADMIN_GROUP_NAME}) and admin user (${ADMIN_EMAIL})`);
+    }
+  } catch (err) {
+    console.error('Error during admin group/user auto-init:', err);
+  }
+}
+
+// Call after pool is defined
+ensureAdminGroupAndUser();
+
+// ...existing code...
 
 // --- SOCKET.IO ---
 const http = require('http');
@@ -52,9 +95,11 @@ app.post("/api/auth/login", async (req, res) => {
   if (!validPassword) {
     return res.status(401).json({ error: "Invalid login" });
   }
-  // Include group_id in JWT for easier access
+  // Automatically set role to 'admin' if in admin group
+  const ADMIN_GROUP_ID = 1; // Change if your admin group id is different
+  const role = (user.group_id === ADMIN_GROUP_ID) ? 'admin' : (user.role || 'user');
   const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role, group_id: user.group_id },
+    { id: user.id, email: user.email, role, group_id: user.group_id },
     process.env.JWT_SECRET,
     { expiresIn: "8h" }
   );
@@ -91,6 +136,15 @@ app.get("/api/catalog/:id", requireAuth, async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     console.error("GET /api/catalog/:id error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/groups/approved", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM groups WHERE is_hidden = FALSE ORDER BY name ASC");
+    res.json(result.rows);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -223,6 +277,19 @@ app.patch("/api/catalog/:id", requireAuth, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Catalog item not found" });
     }
+    // If status is set to 'Needs Ordered', create an order if one doesn't exist
+    if (fields.status === "Needs Ordered") {
+      const orderCheck = await pool.query(
+        "SELECT * FROM orders WHERE material_id = $1 AND group_id = $2 AND delivered_on IS NULL",
+        [id, group_id]
+      );
+      if (orderCheck.rows.length === 0) {
+        await pool.query(
+          "INSERT INTO orders (material_id, group_id) VALUES ($1, $2)",
+          [id, group_id]
+        );
+      }
+    }
     console.log("PATCH /api/catalog/:id updated row:", result.rows[0]);
     res.json(result.rows[0]);
   } catch (err) {
@@ -296,6 +363,45 @@ app.get("/api/orders/export", requireAuth, async (req, res) => {
   }
 });
 
+// Update an order and sync catalog item status
+app.patch("/api/orders/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const group_id = req.user.group_id;
+    const { ordered_by, received_by, ordered_on, delivered_on, price_paid } = req.body;
+
+    // Update the order
+    const result = await pool.query(
+      `UPDATE orders SET ordered_by = $1, received_by = $2, ordered_on = $3, delivered_on = $4, price_paid = $5
+       WHERE id = $6 AND group_id = $7 RETURNING *`,
+      [ordered_by, received_by, ordered_on, delivered_on, price_paid, id, group_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Also update the catalog item status
+    const order = result.rows[0];
+    let newStatus = null;
+    if (delivered_on) {
+      newStatus = "Received";
+    } else if (ordered_on) {
+      newStatus = "Ordered";
+    }
+    if (newStatus) {
+      await pool.query(
+        "UPDATE material_catalog SET status = $1 WHERE id = $2 AND group_id = $3",
+        [newStatus, order.material_id, group_id]
+      );
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("PATCH /api/orders/:id error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- GROUP REGISTRATION ---
 // Table: pending_groups (id SERIAL, name TEXT UNIQUE, approved BOOLEAN DEFAULT FALSE)
 app.post("/api/groups/register", async (req, res) => {
@@ -316,18 +422,77 @@ app.post("/api/groups/register", async (req, res) => {
   }
 });
 
-// Admin endpoint to approve group
-app.post("/api/groups/approve", async (req, res) => {
-  // You should protect this route (e.g., check req.user.email === 'your@email.com')
-  const { name } = req.body;
+
+// Register a new group and the first user as Owner
+app.post("/api/groups/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: "Group name, email, and password required" });
   try {
-    // Move from pending_groups to groups
-    const pending = await pool.query("SELECT * FROM pending_groups WHERE name = $1 AND approved = FALSE", [name]);
-    if (pending.rows.length === 0) return res.status(404).json({ error: "No such pending group" });
-    // Insert into groups
-    await pool.query("INSERT INTO groups (name) VALUES ($1)", [name]);
-    await pool.query("UPDATE pending_groups SET approved = TRUE WHERE name = $1", [name]);
-    res.json({ message: "Group approved and created." });
+    // Create the user first (so we have their id)
+    const passwordHash = await bcrypt.hash(password, 10);
+    const userResult = await pool.query(
+      "INSERT INTO users (email, password_hash, role) VALUES ($1, $2, 'Owner') RETURNING id",
+      [email, passwordHash]
+    );
+    const user_id = userResult.rows[0].id;
+    // Insert group with owner_user_id
+    const groupResult = await pool.query(
+      "INSERT INTO groups (name, owner_user_id) VALUES ($1, $2) RETURNING id",
+      [name, user_id]
+    );
+    const group_id = groupResult.rows[0].id;
+    // Assign the user to the group
+    await pool.query(
+      "UPDATE users SET group_id = $1 WHERE id = $2",
+      [group_id, user_id]
+    );
+    res.status(201).json({ message: "Group and owner user created.", group_id, owner_user_id: user_id });
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ error: "Group name or user email already exists." });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Owner approves a pending user for their group
+app.post("/api/groups/:groupId/approve-user", requireAuth, async (req, res) => {
+  const { groupId } = req.params;
+  const { userId, role } = req.body; // role: 'Head' or 'User'
+  // Check if requester is the owner
+  const group = await pool.query("SELECT owner_user_id FROM groups WHERE id = $1", [groupId]);
+  if (!group.rows.length || group.rows[0].owner_user_id !== req.user.id) {
+    return res.status(403).json({ error: "Only the group owner can approve users." });
+  }
+  // Approve user and set role
+  await pool.query(
+    "UPDATE users SET group_id = $1, role = $2 WHERE id = $3",
+    [groupId, role, userId]
+  );
+  res.json({ message: "User approved and role set." });
+});
+
+// Owner changes a user's role in their group
+app.patch("/api/groups/:groupId/user/:userId/role", requireAuth, async (req, res) => {
+  const { groupId, userId } = req.params;
+  const { role } = req.body; // 'Owner', 'Head', or 'User'
+  // Only owner can change roles
+  const group = await pool.query("SELECT owner_user_id FROM groups WHERE id = $1", [groupId]);
+  if (!group.rows.length || group.rows[0].owner_user_id !== req.user.id) {
+    return res.status(403).json({ error: "Only the group owner can change roles." });
+  }
+  await pool.query(
+    "UPDATE users SET role = $1 WHERE id = $2 AND group_id = $3",
+    [role, userId, groupId]
+  );
+  res.json({ message: "User role updated." });
+});
+
+// Endpoint to list approved groups for dropdown (hide admin group)
+app.get("/api/groups/approved", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM groups WHERE is_hidden = FALSE ORDER BY name ASC");
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
