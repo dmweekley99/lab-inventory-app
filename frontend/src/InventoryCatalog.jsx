@@ -289,6 +289,7 @@ function InventoryCatalog() {
                         >
                             <span role="img" aria-label="delete">🗑️</span>
                         </button>
+                        <Link to={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                         <div style={{ width: '100%', marginBottom: 8 }}>
                             <div className="card-title" style={{
                                 margin: 0,
@@ -301,7 +302,6 @@ function InventoryCatalog() {
                                 maxWidth: '100%'
                             }}>{item.name}</div>
                         </div>
-                        <Link to={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                             <div className="card-severity">
                                 Severity: {item.severity || "N/A"}
                             </div>
@@ -347,6 +347,7 @@ function InventoryCatalog() {
                                 <option value="Very Low">Very Low</option>
                                 <option value="Critical">Critical</option>
                             </select>
+                            
                         </div>
                     </div>
                 ))}
