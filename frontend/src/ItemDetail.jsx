@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import OrderedButton from "./OrderedButton";
 import api from "./api";
 import socket from "./socket";
 
 function ItemDetail({ type }) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    // Restore scroll position if available
+    useEffect(() => {
+        const key = sessionStorage.getItem('last-scroll-key');
+        if (key) {
+            const y = sessionStorage.getItem(key);
+            if (y) {
+                setTimeout(() => window.scrollTo(0, parseInt(y, 10)), 0);
+                sessionStorage.removeItem(key);
+            }
+            sessionStorage.removeItem('last-scroll-key');
+        }
+    }, []);
     const { id } = useParams();
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -57,9 +71,11 @@ function ItemDetail({ type }) {
         }
     };
 
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
     if (!item) return <div>No item found.</div>;
+
 
     const handleOrdered = (updatedItem) => {
         setItem(updatedItem);
@@ -69,6 +85,18 @@ function ItemDetail({ type }) {
 
     return (
         <>
+            <button
+                style={{ margin: '16px 0', padding: '6px 18px', fontSize: 16, borderRadius: 6, border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer' }}
+                onClick={() => {
+                    // Save the scroll key from location.state so the previous page can restore scroll
+                    if (location.state && location.state.scrollKey) {
+                        sessionStorage.setItem('restore-scroll-key', location.state.scrollKey);
+                    }
+                    navigate(-1);
+                }}
+            >
+                ← Back
+            </button>
             {/* Mobile menu button and nav, only for mobile (hidden on desktop via CSS) */}
             <div className="mobile-menu-bar">
                 <button

@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "./api";
@@ -164,6 +164,28 @@ function InventoryCatalog() {
         );
     });
 
+    const navigate = useNavigate();
+
+    // Restore scroll position if available (using a key passed via sessionStorage)
+    useEffect(() => {
+        const scrollKey = sessionStorage.getItem('restore-scroll-key');
+        if (scrollKey) {
+            const y = sessionStorage.getItem(scrollKey);
+            if (y) {
+                setTimeout(() => window.scrollTo(0, parseInt(y, 10)), 0);
+                sessionStorage.removeItem(scrollKey);
+            }
+            sessionStorage.removeItem('restore-scroll-key');
+        }
+    }, [location.pathname, location.search]);
+
+    const handleCardClick = (itemId) => {
+        // Save scroll position with a unique key and pass it in location state
+        const key = `scroll-pos-${location.pathname}${location.search}`;
+        sessionStorage.setItem(key, window.scrollY);
+        navigate(`/catalog/${itemId}`, { state: { scrollKey: key } });
+    };
+
     return (
         <>
             {/* Mobile menu button and nav, only for mobile (hidden on desktop via CSS) */}
@@ -270,7 +292,12 @@ function InventoryCatalog() {
                 </form>
             </div><h3>All Items</h3><div className="inventory-catalog-cards">
                 {filteredItems.map((item) => (
-                    <div className="inventory-card" key={item.id} style={{ position: 'relative' }}>
+                    <div
+                        className="inventory-card"
+                        key={item.id}
+                        style={{ position: 'relative', cursor: 'pointer' }}
+                        onClick={() => handleCardClick(item.id)}
+                    >
                         <button
                             title="Delete"
                             style={{
@@ -285,11 +312,10 @@ function InventoryCatalog() {
                                 padding: 0,
                                 zIndex: 2
                             }}
-                            onClick={() => handleDelete(item)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
                         >
                             <span role="img" aria-label="delete">🗑️</span>
                         </button>
-                        <Link to={`/catalog/${item.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                         <div style={{ width: '100%', marginBottom: 8 }}>
                             <div className="card-title" style={{
                                 margin: 0,
@@ -302,19 +328,19 @@ function InventoryCatalog() {
                                 maxWidth: '100%'
                             }}>{item.name}</div>
                         </div>
-                            <div className="card-severity">
-                                Severity: {item.severity || "N/A"}
-                            </div>
-                            <div className="card-location">
-                                Location: {item.location || item.default_location || "N/A"}
-                            </div>
-                        </Link>
+                        <div className="card-severity">
+                            Severity: {item.severity || "N/A"}
+                        </div>
+                        <div className="card-location">
+                            Location: {item.location || item.default_location || "N/A"}
+                        </div>
                         <div className="card-severity">
                             <label htmlFor={`severity-select-${item.id}`}>Severity: </label>
                             <select
                                 id={`severity-select-${item.id}`}
                                 name={`severity-select-${item.id}`}
                                 value={item.severity || ""}
+                                onClick={e => e.stopPropagation()}
                                 onChange={async (e) => {
                                     const newSeverity = e.target.value;
                                     let patchBody = { severity: newSeverity };
@@ -347,7 +373,6 @@ function InventoryCatalog() {
                                 <option value="Very Low">Very Low</option>
                                 <option value="Critical">Critical</option>
                             </select>
-                            
                         </div>
                     </div>
                 ))}
