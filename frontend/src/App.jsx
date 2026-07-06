@@ -47,6 +47,7 @@ function App() {
     <div className="app-main-container">
       <div className="app-container" style={{ position: "relative" }}>
         <button
+          className="logout-btn"
           onClick={logout}
           style={{
             position: "absolute",

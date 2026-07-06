@@ -330,6 +330,13 @@ h1 {
     border-radius: 8px !important;
   }
 
+  .logout-btn {
+    font-size: 0.8rem !important;
+    padding: 0.2rem 0.55rem !important;
+    border-radius: 6px !important;
+    line-height: 1.1 !important;
+  }
+
   .item-detail-container,
   .item-detail-card {
     font-size: 1.15rem !important;
