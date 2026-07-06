@@ -43,6 +43,8 @@
 
 .desktop-nav-bar {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 @media (max-width: 900px) {
@@ -107,10 +109,15 @@ body {
 /* Main app container to prevent stretching and center content */
 .app-main-container {
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   box-sizing: border-box;
   padding: 0 16px;
+}
+
+.app-container {
+  width: 100%;
+  min-height: 100vh;
 }
 
 .login-outer-container {
@@ -585,9 +592,11 @@ body {
 }
 
 .app-container {
-  max-width: 1400px;
-  margin: 4rem auto;
-  padding: 4rem 3rem;
+  width: min(100%, 1400px);
+  min-height: calc(100vh - 4rem);
+  margin: 2rem auto;
+  padding: clamp(1rem, 2.5vw, 3rem);
+  box-sizing: border-box;
   background: rgba(30, 32, 34, 0.85);
   border-radius: 24px;
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.18);
